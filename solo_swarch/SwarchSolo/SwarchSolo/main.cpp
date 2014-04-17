@@ -75,6 +75,7 @@ int main()
 	passwordT.setPosition(passBox.getGlobalBounds().left + 5, passBox.getGlobalBounds().top);
 
 	bool nameAndPasswordValid = false;
+	bool enterUser = true, enterPass = false;
 	while(window.isOpen() && !nameAndPasswordValid)
 	{
 		userT.setString(user);
@@ -96,15 +97,39 @@ int main()
 					userName.setString(user);
 				}
 				else if(event.key.code == sf::Keyboard::BackSpace)
+				{
 					// If user selected, delete from user
-					user = user.substr(0, user.size() - 1);
-
+					if(enterUser)
+						user = user.substr(0, user.size() - 1);
 					// If password selected, delete from password
+					else if(enterPass)
+						password = password.substr(0, password.size() - 1);
+				}
 			}
 			else if(event.type == sf::Event::TextEntered)
 			{
 				if(event.text.unicode != 8 && event.text.unicode != 15 && event.text.unicode != 127)
-					user += event.text.unicode;
+				{
+					if(enterUser)
+						user += event.text.unicode;
+					else if(enterPass)
+						password += event.text.unicode;
+				}
+			}
+			else if(event.type == sf::Event::MouseButtonPressed)
+			{
+				sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+
+				if(userBox.getGlobalBounds().contains(mousePos.x, mousePos.y))
+				{
+					enterUser = true;
+					enterPass = false;
+				}
+				else if(passBox.getGlobalBounds().contains(mousePos.x, mousePos.y))
+				{
+					enterUser = false;
+					enterPass = true;
+				}
 			}
 		}
 		
