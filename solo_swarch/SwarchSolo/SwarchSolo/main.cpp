@@ -62,17 +62,13 @@ int main()
 					nameAndPasswordValid = true;
 					userName.setString(user);
 				}
-				if(event.key.code == sf::Keyboard::BackSpace)
-				{
-					if(user.size() > 0)
-						user = user.substr(0, user.size() - 1);
-				}
+				else if(event.key.code == sf::Keyboard::BackSpace)
+					user = user.substr(0, user.size() - 1);
 			}
 			else if(event.type == sf::Event::TextEntered)
 			{
-					// We must check which box is being written into, but this will suffice
-					if(event.key.code != sf::Keyboard::BackSpace && event.key.code != sf::Keyboard::Return)
-						user += event.text.unicode;
+				if(event.text.unicode != 8 && event.text.unicode != 15 && event.text.unicode != 127)
+					user += event.text.unicode;
 			}
 		}
 		
