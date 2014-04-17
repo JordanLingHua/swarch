@@ -1,15 +1,16 @@
-﻿Build started 4/12/2014 6:40:20 PM.
-Project "C:\Users\Jordan Hua\Documents\GitHub\swarch\solo_swarch\SwarchSolo\SwarchSolo\SwarchSolo.vcxproj" on node 2 (Build target(s)).
-ClCompile:
-  C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D SFML_STATIC /D WIN32 /D _DEBUG /D _WINDOWS /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc110.pdb" /Gd /TP /analyze- /errorReport:prompt main.cpp
-  main.cpp
-c:\users\jordan hua\documents\github\swarch\solo_swarch\swarchsolo\swarchsolo\main.cpp(25): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
-c:\users\jordan hua\documents\github\swarch\solo_swarch\swarchsolo\swarchsolo\main.cpp(56): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
-Link:
-  C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Jordan Hua\Documents\GitHub\swarch\solo_swarch\SwarchSolo\Debug\SwarchSolo.exe" /INCREMENTAL /NOLOGO "sfml-graphics-s-d.lib" "sfml-system-s-d.lib" "sfml-window-s-d.lib" "sfml-audio-s-d.lib" "sfml-network-s-d.lib" "sfml-main-d.lib" kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\Jordan Hua\Documents\GitHub\swarch\solo_swarch\SwarchSolo\Debug\SwarchSolo.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Jordan Hua\Documents\GitHub\swarch\solo_swarch\SwarchSolo\Debug\SwarchSolo.lib" /MACHINE:X86 Debug\main.obj
-  SwarchSolo.vcxproj -> C:\Users\Jordan Hua\Documents\GitHub\swarch\solo_swarch\SwarchSolo\Debug\SwarchSolo.exe
-Done Building Project "C:\Users\Jordan Hua\Documents\GitHub\swarch\solo_swarch\SwarchSolo\SwarchSolo\SwarchSolo.vcxproj" (Build target(s)).
+﻿Build started 4/17/2014 2:53:04 PM.
+     1>Project "C:\Users\Jonathan\Desktop\Swarch168\swarch\solo_swarch\SwarchSolo\SwarchSolo\SwarchSolo.vcxproj" on node 2 (Build target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D SFML_STATIC /D WIN32 /D _DEBUG /D _WINDOWS /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc110.pdb" /Gd /TP /analyze- /errorReport:prompt main.cpp
+         main.cpp
+     1>c:\users\jonathan\desktop\swarch168\swarch\solo_swarch\swarchsolo\swarchsolo\main.cpp(42): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
+     1>c:\users\jonathan\desktop\swarch168\swarch\solo_swarch\swarchsolo\swarchsolo\main.cpp(113): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
+     1>c:\users\jonathan\desktop\swarch168\swarch\solo_swarch\swarchsolo\swarchsolo\main.cpp(181): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Jonathan\Desktop\Swarch168\swarch\solo_swarch\SwarchSolo\Debug\SwarchSolo.exe" /INCREMENTAL /NOLOGO "sfml-graphics-s-d.lib" "sfml-system-s-d.lib" "sfml-window-s-d.lib" "sfml-audio-s-d.lib" "sfml-network-s-d.lib" "sfml-main-d.lib" kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\Jonathan\Desktop\Swarch168\swarch\solo_swarch\SwarchSolo\Debug\SwarchSolo.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Jonathan\Desktop\Swarch168\swarch\solo_swarch\SwarchSolo\Debug\SwarchSolo.lib" /MACHINE:X86 Debug\main.obj
+         SwarchSolo.vcxproj -> C:\Users\Jonathan\Desktop\Swarch168\swarch\solo_swarch\SwarchSolo\Debug\SwarchSolo.exe
+     1>Done Building Project "C:\Users\Jonathan\Desktop\Swarch168\swarch\solo_swarch\SwarchSolo\SwarchSolo\SwarchSolo.vcxproj" (Build target(s)).
 
 Build succeeded.
 
-Time Elapsed 00:00:02.62
+Time Elapsed 00:00:01.85
