@@ -14,6 +14,9 @@ int main()
 	int windowSizeX = 500;
 	int windowSizeY = 500;
 
+	int textBoxX = 300;
+	int textBoxY = 50;
+
 	int myBoxSizeX = 10;
 	int myBoxSizeY = 10;
 	//int myBoxSize = 10;//comment out.  Just send only myBoxSizeX
@@ -27,8 +30,10 @@ int main()
 	sf::Text userT, passwordT;
 	userT.setFont(font);
 	passwordT.setFont(font);
-	userT.setPosition(sf::Vector2f(0, 100));
-	passwordT.setPosition(sf::Vector2f(0, 200));
+	userT.setOrigin(sf::Vector2f(0, userT.getLocalBounds().height/2));
+	passwordT.setOrigin(sf::Vector2f(0, passwordT.getLocalBounds().height/2));
+	userT.setColor(sf::Color::Black);
+	passwordT.setColor(sf::Color::Black);
 
 	// Create GUI for actual game
 	sf::Text userName;
@@ -40,6 +45,34 @@ int main()
 	sf::RenderWindow window(sf::VideoMode(windowSizeX, windowSizeY), "Swarch");
 	sf::RectangleShape myBox(sf::Vector2f(myBoxSizeX,myBoxSizeY));
 	myBox.setFillColor(sf::Color::Cyan);
+
+	// These texts are for the UI, "Username: ", "Password: ", and "Swarch" respectively
+	sf::Text userTitle, passTitle, gameTitle;
+	userTitle.setFont(font);
+	passTitle.setFont(font);
+	gameTitle.setFont(font);
+	userTitle.setString("Username: ");
+	passTitle.setString("Password: ");
+	gameTitle.setString("Swarch");
+	userTitle.setOrigin(sf::Vector2f(0, userTitle.getLocalBounds().height/2));
+	passTitle.setOrigin(sf::Vector2f(0, passTitle.getLocalBounds().height/2));
+	gameTitle.setOrigin(sf::Vector2f(gameTitle.getLocalBounds().width/2, gameTitle.getLocalBounds().height/2));
+	userTitle.setPosition(sf::Vector2f(20, 200));
+	passTitle.setPosition(sf::Vector2f(20, 300));
+	gameTitle.setPosition(sf::Vector2f(windowSizeX/2, 100));
+
+
+	// These are the boxes our players will enter info into
+	sf::RectangleShape userBox, passBox;
+	userBox.setSize(sf::Vector2f(textBoxX, textBoxY));
+	passBox.setSize(sf::Vector2f(textBoxX, textBoxY));
+	userBox.setOrigin(sf::Vector2f(0, userBox.getLocalBounds().height/2));
+	passBox.setOrigin(sf::Vector2f(0, passBox.getLocalBounds().height/2));
+	userBox.setPosition(sf::Vector2f(userTitle.getGlobalBounds().width + 20, 210));
+	passBox.setPosition(sf::Vector2f(passTitle.getGlobalBounds().width + 20, 310));
+
+	userT.setPosition(userBox.getGlobalBounds().left + 5, userBox.getGlobalBounds().top);
+	passwordT.setPosition(passBox.getGlobalBounds().left + 5, passBox.getGlobalBounds().top);
 
 	bool nameAndPasswordValid = false;
 	while(window.isOpen() && !nameAndPasswordValid)
@@ -63,7 +96,10 @@ int main()
 					userName.setString(user);
 				}
 				else if(event.key.code == sf::Keyboard::BackSpace)
+					// If user selected, delete from user
 					user = user.substr(0, user.size() - 1);
+
+					// If password selected, delete from password
 			}
 			else if(event.type == sf::Event::TextEntered)
 			{
@@ -74,6 +110,14 @@ int main()
 		
 		
 		window.clear(sf::Color(0, 0, 64));
+
+		// Draw the Login GUI
+		window.draw(userTitle);
+		window.draw(passTitle);
+		window.draw(gameTitle);
+		window.draw(userBox);
+		window.draw(passBox);
+		// Draw the user text
 		window.draw(userT);
 		window.draw(passwordT);
 		window.display();
