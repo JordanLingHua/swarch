@@ -42,7 +42,7 @@ int main()
 	userName.setFont(font);
 
 	// Create the window
-	sf::RenderWindow window(sf::VideoMode(windowSizeX, windowSizeY), "Swarch");
+	sf::RenderWindow window(sf::VideoMode(windowSizeX, windowSizeY), "Swarch", sf::Style::Default^sf::Style::Resize);
 	sf::RectangleShape myBox(sf::Vector2f(myBoxSizeX,myBoxSizeY));
 	myBox.setFillColor(sf::Color::Cyan);
 
@@ -73,6 +73,13 @@ int main()
 
 	userT.setPosition(userBox.getGlobalBounds().left + 5, userBox.getGlobalBounds().top);
 	passwordT.setPosition(passBox.getGlobalBounds().left + 5, passBox.getGlobalBounds().top);
+
+	sf::Texture texture;
+	texture.loadFromFile("swarchEnter.png");
+	sf::Sprite enterButton;
+	enterButton.setTexture(texture);
+	enterButton.setOrigin(sf::Vector2f(enterButton.getLocalBounds().width/2, enterButton.getLocalBounds().height/2));
+	enterButton.setPosition(400 ,passBox.getGlobalBounds().top + passBox.getLocalBounds().height/2 + 80);
 
 	bool nameAndPasswordValid = false;
 	bool enterUser = true, enterPass = false;
@@ -130,6 +137,12 @@ int main()
 					enterUser = false;
 					enterPass = true;
 				}
+				else if(enterButton.getGlobalBounds().contains(mousePos.x, mousePos.y))
+				{
+					// We must check to see if the password and name are valid, but for now this will suffice
+					nameAndPasswordValid = true;
+					userName.setString(user);
+				}
 			}
 		}
 		
@@ -145,6 +158,7 @@ int main()
 		// Draw the user text
 		window.draw(userT);
 		window.draw(passwordT);
+		window.draw(enterButton);
 		window.display();
 	}
 
