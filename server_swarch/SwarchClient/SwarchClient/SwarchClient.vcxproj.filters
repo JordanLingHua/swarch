@@ -24,6 +24,9 @@
     <ClCompile Include="GameScene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="UserData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Scene.h">
@@ -33,6 +36,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GameScene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UserData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -20,7 +20,6 @@ public:
 	// ProcessEvents is used to process events created by the window
 	void processEvents(sf::Event& evt, sf::RenderWindow& window);
 
-
 private:
 	sf::Font font;
 	std::string user, password, projectedPassword;

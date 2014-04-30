@@ -87,11 +87,13 @@
     <ClCompile Include="GameScene.cpp" />
     <ClCompile Include="LoginScene.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="UserData.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameScene.h" />
     <ClInclude Include="LoginScene.h" />
     <ClInclude Include="Scene.h" />
+    <ClInclude Include="UserData.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
