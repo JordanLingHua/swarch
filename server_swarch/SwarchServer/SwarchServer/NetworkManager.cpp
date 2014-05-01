@@ -24,17 +24,14 @@ NetworkManager::~NetworkManager(void)
 	}
 }
 
-void NetworkManager::createConnectionThread()
-{
-	sf::Thread thread();
-}
-
 void NetworkManager::networkInput()
 {
+	std::cout << "Accepting input" << std::endl;
+
 	while(!done)
 	{
 		// Make the selector wait for a message
-		if(selector.wait())
+		if(selector.wait(sf::milliseconds(10.f)))
 		{
 			// If the selector has received an invite from a user, try to add them
 			if(selector.isReady(listener))
@@ -48,7 +45,7 @@ void NetworkManager::networkInput()
 					std::cout << "A client has joined the server" << std::endl;
 					selector.add(*client);
 					clientList.push_back(client);
-					
+
 					// Allow for input without threading
 					client->setBlocking(false);
 				}
@@ -62,24 +59,33 @@ void NetworkManager::networkInput()
 			{
 				for(auto it = clientList.begin(); it != clientList.end(); it++)
 				{
-				
+					if(selector.isReady((**it)))
+					{
+						// Read the packet in
+						sf::Packet pkt;
+
+						(**it).receive(pkt);
+
+						std::cout << pkt << std::endl;
+					}
 				}
 			}
 		}
 	}
+
+	std::cout << "Ending thread" << std::endl;
 }
 
 void NetworkManager::run()
 {
-	// While the server isn't finished
-	while(!done)
+	// If we press the escape key, end the simulation
+	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
 	{
-		// If we press the escape key, end the simulation
-		if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
-		{
-			done = true;
-		}
-
-		
+		done = true;
 	}
+}
+
+bool NetworkManager::isProgramDone()
+{
+	return done;
 }

@@ -1,25 +1,21 @@
-#include <SFML/Graphics.hpp>
-#include <sqlite3.h>
+#include "NetworkManager.h"
+#include <list>
 
 int main()
 {
-    sf::RenderWindow window(sf::VideoMode(200, 200), "SFML works!");
-    sf::CircleShape shape(100.f);
-    shape.setFillColor(sf::Color::Green);
+	std::list<sf::Thread*> threadList;
 
-    while (window.isOpen())
-    {
-        sf::Event event;
-        while (window.pollEvent(event))
-        {
-            if (event.type == sf::Event::Closed)
-                window.close();
-        }
+	NetworkManager netMan;
 
-        window.clear();
-        window.draw(shape);
-        window.display();
-    }
+	sf::Thread acceptThread(&NetworkManager::networkInput, &netMan);
+	acceptThread.launch();
+	threadList.push_back(&acceptThread);
 
+	while(!netMan.isProgramDone())
+	{
+		netMan.run();
+	}
+
+   system("pause");
     return 0;
 }

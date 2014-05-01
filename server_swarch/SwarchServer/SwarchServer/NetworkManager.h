@@ -3,6 +3,7 @@
 
 #include <SFML/Network.hpp>
 #include <SFML/Graphics.hpp>
+#include <SFML/System.hpp>
 #include <list>
 #include <iostream>
 
@@ -12,15 +13,14 @@ public:
 	NetworkManager(void);
 	~NetworkManager(void);
 
-	void createConnectionThread();
 	void networkInput();
 	void run();
+	bool isProgramDone();
 
 private:
 	sf::TcpListener listener;
 	sf::SocketSelector selector;
-	std::list<sf::Socket*> clientList;
-	std::list<sf::Thread> threadList;
+	std::list<sf::TcpSocket*> clientList;
 	bool done;
 };
 
