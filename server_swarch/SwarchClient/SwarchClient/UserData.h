@@ -13,6 +13,12 @@ public:
 
 	std::string userNameStorage;
 	std::string passwordStorage;
+	bool startLogin;
+	bool startGame;
+
+	void changeToGame();
+	void changeToLogin();
+
 	//Thought implementation could work this way before.  Good to experiment!
 	//static std::string userNameStorage;
 	//static std::string passwordStorage;

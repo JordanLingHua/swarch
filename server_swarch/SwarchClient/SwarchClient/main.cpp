@@ -12,7 +12,7 @@ int main()
 
 	// The currentScene is the scene that the game is currently running
 	//Scene* currentScene = new LoginScene;
-	Scene* currentScene = new GameScene;
+	Scene* currentScene = new LoginScene;
 
 	// Set up a timer to calculate the time between frames
 	sf::Clock deltaTimer;
@@ -54,9 +54,23 @@ int main()
 
 		// Display the content on the screen
 		window.display();
+
+		if(userStuff->startGame)
+		{
+			delete currentScene;
+			currentScene = new GameScene(userStuff->userNameStorage);
+			userStuff->startGame = false;
+		}
+		else if(userStuff->startLogin)
+		{
+			delete currentScene;
+			currentScene = new LoginScene;
+			userStuff->startLogin = false;
+		}
 	}
 
 	// Delete the scene upon closing
 	delete currentScene;
+	delete userStuff;
     return 0;
 }

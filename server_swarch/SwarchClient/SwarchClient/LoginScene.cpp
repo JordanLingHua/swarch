@@ -61,6 +61,7 @@ LoginScene::LoginScene(void)
 
 LoginScene::~LoginScene(void)
 {
+	delete userObject;
 }
 
 void LoginScene::update(float deltaTime)
@@ -100,9 +101,10 @@ UserData LoginScene::processEvents(sf::Event& evt, sf::RenderWindow& window)
 		if(evt.key.code == sf::Keyboard::Return)
 		{
 			// We must check to see if the password and name are valid, but for now this will suffice
-			//userName.setString(user);
+			userObject->userNameStorage = user;
+			userObject->passwordStorage = password;
 
-			// Tell the main program to go to the next scene with the new password
+			userObject->changeToGame();
 		}
 		// Was the key BackSpace?
 		else if(evt.key.code == sf::Keyboard::BackSpace)
@@ -156,9 +158,11 @@ UserData LoginScene::processEvents(sf::Event& evt, sf::RenderWindow& window)
 			userObject->userNameStorage = user;
 			userObject->passwordStorage = password;
 
-			return *userObject;
+			userObject->changeToGame();
 		}
 	}
+
+	return *userObject;
 }
 
 

@@ -1,6 +1,6 @@
 #include "GameScene.h"
 
-GameScene::GameScene(void)
+GameScene::GameScene(std::string username)
 	:delay(0), dx(0), dy(1), numOfPellets(4)
 {
 	// We must load a font as SFML doesn't provide a default font to use
@@ -10,6 +10,7 @@ GameScene::GameScene(void)
 	userName.setColor(sf::Color::Yellow);
 	userName.setString("ErrorName");
 	userName.setFont(font);
+	userName.setString(username);
 
 	// Create the player icon
 	myBox.setFillColor(sf::Color::Cyan);
@@ -110,9 +111,14 @@ void GameScene::draw(sf::RenderWindow& window)
 //void GameScene::processEvents(sf::Event& evt, sf::RenderWindow& window)
 UserData GameScene::processEvents(sf::Event& evt, sf::RenderWindow& window)//returns type userData b/c consequence it is needed for use in loginScene child.  optional.  Not needed here
 {
-
+	UserData user("","");
 	if (evt.type == sf::Event::Closed)
 		window.close();
 
-	return UserData("","");//Because syntax requires this
+	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+	{
+		user.changeToLogin();
+	}
+
+	return user;//Because syntax requires this
 }

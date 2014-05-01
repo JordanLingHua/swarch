@@ -15,7 +15,7 @@
 class GameScene : public Scene
 {
 public:
-	GameScene(void);
+	GameScene(std::string username = "Error");
 	~GameScene(void);
 
 	// Update is ran every frame and is used to update our game state
