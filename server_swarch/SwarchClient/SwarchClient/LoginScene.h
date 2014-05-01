@@ -9,6 +9,15 @@
 #define TEXTBOXSIZEX 300
 #define TEXTBOXSIZEY 50
 
+//This code is called twice in LoginScene.cpp to enable GameScene object to be assigned in main.cpp
+/*
+//Login scene fulfills its role.  changeToGame() function called to update the flag so that the 
+//Scene* object in main.cpp can be re-assigned to a GameScene object!
+			userObject->changeToGame();
+*/
+
+
+
 // The LoginScene is a type of Scene in which users can type in their username and password
 class LoginScene : public Scene
 {

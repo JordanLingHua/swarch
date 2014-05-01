@@ -4,6 +4,11 @@
 //Other stuff
 #include "UserData.h"
 
+//**In this main function, we use ONLY the original 
+//Scene object so that we can simply change the scene object's functionality by
+//assigning it to an inheritance variation of the Scene object!!!!
+
+//Re-assign scene object and display it using the window commands from SFML's library
 
 int main()
 {
@@ -55,16 +60,20 @@ int main()
 		// Display the content on the screen
 		window.display();
 
-		if(userStuff->startGame)
+
+		//Switching from login screen to game screen is done with the following first two if else ifs.  
+		if(userStuff->startGame)//if startgame flag enabled true somewhere,
 		{
 			delete currentScene;
-			currentScene = new GameScene(userStuff->userNameStorage);
+			currentScene = new GameScene(userStuff->userNameStorage);//switch to gamescene 
+			//and pass the username to gamescene so that gamescene's frames its main loop will display user name
 			userStuff->startGame = false;
 		}
-		else if(userStuff->startLogin)
+		else if(userStuff->startLogin)// if login flag enabled true somewhere,
 		{
 			delete currentScene;
-			currentScene = new LoginScene;
+			currentScene = new LoginScene;// switch to login scene.  **Notice how useful using a Scene inheritance is useful here, because
+			//you get to switch between different variants of the scene object.  
 			userStuff->startLogin = false;
 		}
 	}

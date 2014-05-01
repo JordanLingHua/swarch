@@ -15,7 +15,7 @@ NetworkManager::NetworkManager(void)
 
 NetworkManager::~NetworkManager(void)
 {
-	done = false;
+	done = true;
 
 	// If we haven't deleted all of the sockets, delete them
 	for(auto it = clientList.begin(); it != clientList.end(); it++)
@@ -47,7 +47,7 @@ void NetworkManager::networkInput()
 					clientList.push_back(client);
 
 					// Allow for input without threading
-					client->setBlocking(false);
+					//client->setBlocking(false);
 				}
 				// Delete the client if they cannot be accepted
 				else

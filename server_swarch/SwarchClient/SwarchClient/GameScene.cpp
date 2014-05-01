@@ -1,5 +1,13 @@
 #include "GameScene.h"
 
+
+//This code is called twice in LoginScene.cpp to enable GameScene object to be assigned in main.cpp
+/*
+//Login scene fulfills its role.  changeToGame() function called to update the flag so that the 
+//Scene* object in main.cpp can be re-assigned to a GameScene object!
+			userObject->changeToGame();
+*/
+
 GameScene::GameScene(std::string username)
 	:delay(0), dx(0), dy(1), numOfPellets(4)
 {
@@ -117,7 +125,8 @@ UserData GameScene::processEvents(sf::Event& evt, sf::RenderWindow& window)//ret
 
 	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
 	{
-		user.changeToLogin();
+		user.changeToLogin();//Switch back to game scene as this project alone
+		//Later, disconnect from server also implemented here with some easy calls!
 	}
 
 	return user;//Because syntax requires this

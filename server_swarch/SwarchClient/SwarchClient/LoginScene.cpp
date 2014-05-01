@@ -104,6 +104,8 @@ UserData LoginScene::processEvents(sf::Event& evt, sf::RenderWindow& window)
 			userObject->userNameStorage = user;
 			userObject->passwordStorage = password;
 
+			//Login scene fulfills its role.  changeToGame() function called to update the flag so that the 
+			//Scene* object in main.cpp can be re-assigned to a GameScene object!
 			userObject->changeToGame();
 		}
 		// Was the key BackSpace?
@@ -158,6 +160,8 @@ UserData LoginScene::processEvents(sf::Event& evt, sf::RenderWindow& window)
 			userObject->userNameStorage = user;
 			userObject->passwordStorage = password;
 
+			//Login scene fulfills its role.  changeToGame() function called to update the flag so that the 
+			//Scene* object in main.cpp can be re-assigned to a GameScene object!
 			userObject->changeToGame();
 		}
 	}
