@@ -1,6 +1,9 @@
 #include "LoginScene.h"
 #include "GameScene.h"
 
+//Other stuff
+#include "UserData.h"
+
 
 int main()
 {
@@ -15,6 +18,12 @@ int main()
 	sf::Clock deltaTimer;
 	sf::Time lastFrameTime;
 
+
+	//Other stuff
+	UserData* userStuff = new UserData("","");
+
+
+
 	// While we are running our program
 	while(window.isOpen())
 	{
@@ -27,7 +36,11 @@ int main()
 		while(window.pollEvent(event))
 		{
 			// Send the event to the current scene
-			currentScene->processEvents(event, window);
+
+			//currentScene->processEvents(event, window);
+			//Can be called as regular void function, but we want
+			//to also get the user data to process it here in this case too!
+			*userStuff = currentScene->processEvents(event, window);
 		}
 		
 		// Update the current scene

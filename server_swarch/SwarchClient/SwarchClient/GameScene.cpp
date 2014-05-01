@@ -107,8 +107,12 @@ void GameScene::draw(sf::RenderWindow& window)
 	}
 }
 
-void GameScene::processEvents(sf::Event& evt, sf::RenderWindow& window)
+//void GameScene::processEvents(sf::Event& evt, sf::RenderWindow& window)
+UserData GameScene::processEvents(sf::Event& evt, sf::RenderWindow& window)//returns type userData b/c consequence it is needed for use in loginScene child.  optional.  Not needed here
 {
+
 	if (evt.type == sf::Event::Closed)
 		window.close();
+
+	return UserData("","");//Because syntax requires this
 }

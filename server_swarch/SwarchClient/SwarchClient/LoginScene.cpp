@@ -1,5 +1,7 @@
 #include "LoginScene.h"
 
+#include "UserData.h"
+
 LoginScene::LoginScene(void)
 	:enterUser(true), enterPass(false)
 {
@@ -47,6 +49,14 @@ LoginScene::LoginScene(void)
 	enterButton.setTexture(texture);
 	enterButton.setOrigin(sf::Vector2f(enterButton.getLocalBounds().width/2, enterButton.getLocalBounds().height/2));
 	enterButton.setPosition(400 ,passBox.getGlobalBounds().top + passBox.getLocalBounds().height/2 + 80);
+
+
+	//Other stuff
+	//enableGetUserNameAndPassword = false;
+
+	userObject = new UserData("","");
+
+
 }
 
 LoginScene::~LoginScene(void)
@@ -75,7 +85,8 @@ void LoginScene::draw(sf::RenderWindow& window)
 		window.draw(enterButton);
 }
 
-void LoginScene::processEvents(sf::Event& evt, sf::RenderWindow& window)
+//void LoginScene::processEvents(sf::Event& evt, sf::RenderWindow& window)
+UserData LoginScene::processEvents(sf::Event& evt, sf::RenderWindow& window)
 {
 	// If the user tries to close the window, end the simulation
 	if(evt.type == sf::Event::Closed)
@@ -141,6 +152,24 @@ void LoginScene::processEvents(sf::Event& evt, sf::RenderWindow& window)
 		{
 			// We must check to see if the password and name are valid, but for now this will suffice
 			//userName.setString(user);
+			//enableGetUserNameAndPassword = true;
+			userObject->userNameStorage = user;
+			userObject->passwordStorage = password;
+
+			return *userObject;
 		}
 	}
 }
+
+
+//
+//std::string LoginScene::getUserName(void)
+//{
+	
+//	return user;
+//}
+//std::string LoginScene::getPassword(void)
+//{
+
+//	return password;
+//}

@@ -3,6 +3,9 @@
 
 #include "Scene.h"
 
+//Confirmed that Not needed since Scene.h has it.  But just in case.  
+#include "UserData.h"
+
 #define WINDOWSIZEX 500
 #define WINDOWSIZEY 500
 #define SPEED 200.0f
@@ -20,7 +23,8 @@ public:
 	// Draw is ran every frame to draw our game state
 	void draw(sf::RenderWindow& window);
 	// ProcessEvents is used to process events the window creates
-	void processEvents(sf::Event& evt, sf::RenderWindow& window);
+	//void processEvents(sf::Event& evt, sf::RenderWindow& window);
+	UserData processEvents(sf::Event& evt, sf::RenderWindow& window);
 
 private:
 	sf::Font font;

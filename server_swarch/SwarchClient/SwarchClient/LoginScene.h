@@ -3,6 +3,9 @@
 
 #include "Scene.h"
 
+//For user object
+#include "UserData.h"
+
 #define TEXTBOXSIZEX 300
 #define TEXTBOXSIZEY 50
 
@@ -18,7 +21,19 @@ public:
 	// Draw is ran every frame and is used to draw the login menu
 	void draw(sf::RenderWindow& window);
 	// ProcessEvents is used to process events created by the window
-	void processEvents(sf::Event& evt, sf::RenderWindow& window);
+	//void processEvents(sf::Event& evt, sf::RenderWindow& window);
+	UserData processEvents(sf::Event& evt, sf::RenderWindow& window);
+
+	//functions that return username and password values.  
+	//Called in game func that uses
+	//a LoginScene object.  
+	//bool enableGetUserNameAndPassword;
+	//std::string getUserName(void);
+	//std::string getPassword(void);
+
+	//User object to return
+	UserData* userObject;
+
 
 private:
 	sf::Font font;
