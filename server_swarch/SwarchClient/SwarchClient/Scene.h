@@ -2,7 +2,7 @@
 #define SCENE_H
 
 #include <SFML/Graphics.hpp>
-
+#include "NetworkManager.h"
 //Other stuff
 #include "UserData.h"
 
@@ -12,14 +12,14 @@ class Scene
 {
 public:
 	// Update is called every frame and is used to update the current state of the scene
-	virtual void update(float deltaTime) = 0;
+	virtual void update(float deltaTime, NetworkManager& netMan) = 0;
 	// Draw is called every frame, drawing the current state
 	virtual void draw(sf::RenderWindow& window) = 0;
 	// HandleEvent is called every time an event is processed by the program, performing the appropriate action per scene
 	//virtual void processEvents(sf::Event& evt, sf::RenderWindow& window) = 0;
 	
 	//version of HandleEvent that is used for assigning user to user object
-	virtual UserData processEvents(sf::Event& evt, sf::RenderWindow& window) = 0;
+	virtual UserData processEvents(sf::Event& evt, sf::RenderWindow& window, NetworkManager& netMan) = 0;
 	//Can be used to return nothing still
 
 };

@@ -2,6 +2,7 @@
 #define LOGINSCENE_H
 
 #include "Scene.h"
+#include "md5.h"
 
 //For user object
 #include "UserData.h"
@@ -26,12 +27,12 @@ public:
 	~LoginScene(void);
 
 	// Update is ran every frame and is used to update the login states
-	void update(float deltaTime);
+	void update(float deltaTime, NetworkManager& netMan);
 	// Draw is ran every frame and is used to draw the login menu
 	void draw(sf::RenderWindow& window);
 	// ProcessEvents is used to process events created by the window
 	//void processEvents(sf::Event& evt, sf::RenderWindow& window);
-	UserData processEvents(sf::Event& evt, sf::RenderWindow& window);
+	UserData processEvents(sf::Event& evt, sf::RenderWindow& window, NetworkManager& netMan);
 
 	//functions that return username and password values.  
 	//Called in game func that uses

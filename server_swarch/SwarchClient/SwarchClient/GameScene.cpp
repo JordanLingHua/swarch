@@ -50,7 +50,7 @@ GameScene::~GameScene(void)
 	delete[] pelletList;
 }
 
-void GameScene::update(float deltaTime)
+void GameScene::update(float deltaTime, NetworkManager& netMan)
 {
 	// Get the input from the user to calculate direction
 	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
@@ -117,16 +117,18 @@ void GameScene::draw(sf::RenderWindow& window)
 }
 
 //void GameScene::processEvents(sf::Event& evt, sf::RenderWindow& window)
-UserData GameScene::processEvents(sf::Event& evt, sf::RenderWindow& window)//returns type userData b/c consequence it is needed for use in loginScene child.  optional.  Not needed here
+UserData GameScene::processEvents(sf::Event& evt, sf::RenderWindow& window, NetworkManager& netMan)//returns type userData b/c consequence it is needed for use in loginScene child.  optional.  Not needed here
 {
 	UserData user("","");
 	if (evt.type == sf::Event::Closed)
 		window.close();
 
-	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+	if(sf::Keyboard::isKeyPressed(sf::Keyboard::BackSpace))
 	{
 		user.changeToLogin();//Switch back to game scene as this project alone
 		//Later, disconnect from server also implemented here with some easy calls!
+
+		netMan.disconnectFromServer();
 	}
 
 	return user;//Because syntax requires this

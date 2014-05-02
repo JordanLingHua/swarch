@@ -7,6 +7,8 @@
 #include <list>
 #include <iostream>
 
+#include "DatabaseManager.h"
+
 class NetworkManager
 {
 public:
@@ -22,6 +24,9 @@ private:
 	sf::SocketSelector selector;
 	std::list<sf::TcpSocket*> clientList;
 	bool done;
+
+	sf::Mutex clientLock;
+	DatabaseManager dm;
 };
 
 #endif // NETWORKMANAGER_H

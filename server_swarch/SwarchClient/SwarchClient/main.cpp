@@ -1,5 +1,6 @@
 #include "LoginScene.h"
 #include "GameScene.h"
+#include "NetworkManager.h"
 
 //Other stuff
 #include "UserData.h"
@@ -12,11 +13,12 @@
 
 int main()
 {
+	NetworkManager netMan;
+
 	// Create the window that will be used for login and gameplay
 	sf::RenderWindow window(sf::VideoMode(WINDOWSIZEX, WINDOWSIZEY), "Swarch", sf::Style::Default^sf::Style::Resize);
 
 	// The currentScene is the scene that the game is currently running
-	//Scene* currentScene = new LoginScene;
 	Scene* currentScene = new LoginScene;
 
 	// Set up a timer to calculate the time between frames
@@ -45,11 +47,11 @@ int main()
 			//currentScene->processEvents(event, window);
 			//Can be called as regular void function, but we want
 			//to also get the user data to process it here in this case too!
-			*userStuff = currentScene->processEvents(event, window);
+			*userStuff = currentScene->processEvents(event, window, netMan);
 		}
 		
 		// Update the current scene
-		currentScene->update(deltaTime);
+		currentScene->update(deltaTime, netMan);
 
 		// Empty the window
 		window.clear(sf::Color(0, 0, 64));
@@ -76,10 +78,22 @@ int main()
 			//you get to switch between different variants of the scene object.  
 			userStuff->startLogin = false;
 		}
+
+		/*if(netMan.connectionMade() && !netMan.threadsRunning())
+		{
+			netMan.threadsMade();
+			sf::Thread readThread(&NetworkManager::receiveMessagesFromServer, &netMan);
+			sf::Thread writeThread(&NetworkManager::sendMessagesToServer, &netMan);
+
+			//readThread.launch();
+			//writeThread.launch();
+		}*/
 	}
 
 	// Delete the scene upon closing
 	delete currentScene;
 	delete userStuff;
+
+	system("pause");
     return 0;
 }

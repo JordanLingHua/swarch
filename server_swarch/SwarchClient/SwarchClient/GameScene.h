@@ -19,12 +19,12 @@ public:
 	~GameScene(void);
 
 	// Update is ran every frame and is used to update our game state
-	void update(float deltaTime);
+	void update(float deltaTime, NetworkManager& netMan);
 	// Draw is ran every frame to draw our game state
 	void draw(sf::RenderWindow& window);
 	// ProcessEvents is used to process events the window creates
 	//void processEvents(sf::Event& evt, sf::RenderWindow& window);
-	UserData processEvents(sf::Event& evt, sf::RenderWindow& window);
+	UserData processEvents(sf::Event& evt, sf::RenderWindow& window, NetworkManager& netMan);
 
 private:
 	sf::Font font;

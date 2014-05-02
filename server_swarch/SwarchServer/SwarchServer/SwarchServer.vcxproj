@@ -84,10 +84,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="DatabaseManager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="NetworkManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DatabaseManager.h" />
     <ClInclude Include="NetworkManager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

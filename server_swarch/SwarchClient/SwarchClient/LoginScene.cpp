@@ -64,7 +64,7 @@ LoginScene::~LoginScene(void)
 	delete userObject;
 }
 
-void LoginScene::update(float deltaTime)
+void LoginScene::update(float deltaTime, NetworkManager& netMan)
 {
 	// Update the sf::Text with the string the user has entered
 	userT.setString(user);
@@ -87,7 +87,7 @@ void LoginScene::draw(sf::RenderWindow& window)
 }
 
 //void LoginScene::processEvents(sf::Event& evt, sf::RenderWindow& window)
-UserData LoginScene::processEvents(sf::Event& evt, sf::RenderWindow& window)
+UserData LoginScene::processEvents(sf::Event& evt, sf::RenderWindow& window, NetworkManager& netMan)
 {
 	// If the user tries to close the window, end the simulation
 	if(evt.type == sf::Event::Closed)
@@ -103,6 +103,8 @@ UserData LoginScene::processEvents(sf::Event& evt, sf::RenderWindow& window)
 			// We must check to see if the password and name are valid, but for now this will suffice
 			userObject->userNameStorage = user;
 			userObject->passwordStorage = password;
+		
+			netMan.connectToServer(user, MD5(password).hexdigest());
 
 			//Login scene fulfills its role.  changeToGame() function called to update the flag so that the 
 			//Scene* object in main.cpp can be re-assigned to a GameScene object!
@@ -159,6 +161,8 @@ UserData LoginScene::processEvents(sf::Event& evt, sf::RenderWindow& window)
 			//enableGetUserNameAndPassword = true;
 			userObject->userNameStorage = user;
 			userObject->passwordStorage = password;
+
+			netMan.connectToServer(user, MD5(password).hexdigest());
 
 			//Login scene fulfills its role.  changeToGame() function called to update the flag so that the 
 			//Scene* object in main.cpp can be re-assigned to a GameScene object!

@@ -47,7 +47,7 @@ void NetworkManager::networkInput()
 					clientList.push_back(client);
 
 					// Allow for input without threading
-					//client->setBlocking(false);
+					client->setBlocking(false);
 				}
 				// Delete the client if they cannot be accepted
 				else
@@ -57,18 +57,49 @@ void NetworkManager::networkInput()
 			}
 			else
 			{
-				for(auto it = clientList.begin(); it != clientList.end(); it++)
-				{
-					if(selector.isReady((**it)))
+				clientLock.lock();
+					for(auto it = clientList.begin(); it != clientList.end(); it++)
 					{
-						// Read the packet in
-						sf::Packet pkt;
+						if(selector.isReady((**it)))
+						{
+							// Read the packet in
+							sf::Packet pkt;
 
-						(**it).receive(pkt);
+							(**it).receive(pkt);
 
-						std::cout << pkt << std::endl;
+							std::string user, pass;
+							if(pkt >> user >> pass)
+							{
+								if(dm.doesUserExistInDB(user))
+								{
+									// Check to see if the password matches
+									if(dm.doesPasswordMatchUser(user, pass))
+									{
+										sf::Packet packet;
+										packet << "y";
+										(**it).send(packet);
+									}
+									else
+									{
+										sf::Packet packet;
+										packet << "n";
+										(**it).send(packet);
+									}
+								}
+								else
+								{
+									// The user doesn't exist, create the entry!
+									dm.insertEntry(user, pass);
+
+									// Send a yes to the client
+										sf::Packet packet;
+										packet << "y";
+										(**it).send(packet);
+								}
+							}
+						}
 					}
-				}
+				clientLock.unlock();
 			}
 		}
 	}
@@ -83,6 +114,24 @@ void NetworkManager::run()
 	{
 		done = true;
 	}
+
+	clientLock.lock();
+
+		// Check to see if any clients have disconnected and remove them
+		for(auto it = clientList.begin(); it != clientList.end(); it++)
+		{
+			if((*it)->getRemoteAddress() == sf::IpAddress::None)
+			{
+				auto itToErase = it;
+				it++;
+				delete (*itToErase);
+				clientList.erase(itToErase);
+				std::cout << "A client has disconnected" << std::endl;
+				continue;
+			}
+		}
+
+	clientLock.unlock();
 }
 
 bool NetworkManager::isProgramDone()
