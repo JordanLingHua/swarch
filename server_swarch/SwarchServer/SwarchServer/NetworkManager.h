@@ -25,7 +25,6 @@ private:
 	std::list<sf::TcpSocket*> clientList;
 	bool done;
 
-	sf::Mutex clientLock;
 	DatabaseManager dm;
 };
 

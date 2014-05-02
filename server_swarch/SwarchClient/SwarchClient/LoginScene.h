@@ -52,7 +52,7 @@ private:
 	sf::RectangleShape userBox, passBox;
 	sf::Texture texture;
 	sf::Sprite enterButton;
-	bool enterUser, enterPass;
+	bool enterUser, enterPass, infoSent;
 };
 
 #endif // LOGINSCENE_H

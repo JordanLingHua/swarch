@@ -23,13 +23,13 @@ NetworkManager::~NetworkManager(void)
 void NetworkManager::connectToServer(std::string username, std::string password)
 {
 	socket = new sf::TcpSocket;
-	if(socket->connect(ip, portNum) == sf::TcpSocket::Done)
+	if(socket->connect(ip, portNum) == sf::TcpSocket::Done)//if server acknowledges back with a done(which indicates we connected)
 	{
 		socket->setBlocking(false);
 
 		sf::Packet pkt;
 
-		pkt << username << password;
+		pkt << username << password;//when this function is called in main.cpp, send the username and password passed in
 		socket->send(pkt);
 
 		isConnected = true;
@@ -53,7 +53,7 @@ void NetworkManager::sendMessagesToServer()
 
 void NetworkManager::receiveMessagesFromServer()
 {
-	while(isConnected)
+	if(isConnected)
 	{
 		sf::Packet pkt;
 		socket->receive(pkt);

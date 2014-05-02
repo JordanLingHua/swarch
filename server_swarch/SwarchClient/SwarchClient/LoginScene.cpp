@@ -3,7 +3,7 @@
 #include "UserData.h"
 
 LoginScene::LoginScene(void)
-	:enterUser(true), enterPass(false)
+	:enterUser(true), enterPass(false), infoSent(false)
 {
 	// We must load a font as SFML doesn't provide a default font to use
 	font.loadFromFile("arial.ttf");
@@ -69,6 +69,30 @@ void LoginScene::update(float deltaTime, NetworkManager& netMan)
 	// Update the sf::Text with the string the user has entered
 	userT.setString(user);
 	passwordT.setString(projectedPassword);
+
+	if(infoSent && !netMan.readQueue.empty())
+	{
+		sf::Packet pkt = netMan.readQueue.front();
+		netMan.readQueue.pop();
+
+		std::string cmd;
+		pkt >> cmd;
+
+		if(cmd.compare("y") == 0)
+		{
+			//Login scene fulfills its role.  changeToGame() function called to update the flag so that the 
+			//Scene* object in main.cpp can be re-assigned to a GameScene object!
+			userObject->changeToGame();
+		}
+		else if(cmd.compare("n") == 0)
+		{
+			user = "";
+			password = "";
+			projectedPassword = "";
+
+			netMan.disconnectFromServer();//We added disconnect so we won't cause memory leaks from having the client connect and then not go into the game
+		}
+	}
 }
 
 void LoginScene::draw(sf::RenderWindow& window)
@@ -98,17 +122,14 @@ UserData LoginScene::processEvents(sf::Event& evt, sf::RenderWindow& window, Net
 	else if(evt.type == sf::Event::KeyPressed)
 	{
 		// Was the key Return?
-		if(evt.key.code == sf::Keyboard::Return)
+		if(evt.key.code == sf::Keyboard::Return && !infoSent)
 		{
 			// We must check to see if the password and name are valid, but for now this will suffice
 			userObject->userNameStorage = user;
 			userObject->passwordStorage = password;
 		
 			netMan.connectToServer(user, MD5(password).hexdigest());
-
-			//Login scene fulfills its role.  changeToGame() function called to update the flag so that the 
-			//Scene* object in main.cpp can be re-assigned to a GameScene object!
-			userObject->changeToGame();
+			infoSent = true;
 		}
 		// Was the key BackSpace?
 		else if(evt.key.code == sf::Keyboard::BackSpace)
@@ -154,7 +175,7 @@ UserData LoginScene::processEvents(sf::Event& evt, sf::RenderWindow& window, Net
 			enterUser = false;
 			enterPass = true;
 		}
-		else if(enterButton.getGlobalBounds().contains(mousePos.x, mousePos.y))
+		else if(enterButton.getGlobalBounds().contains(mousePos.x, mousePos.y) && !infoSent)
 		{
 			// We must check to see if the password and name are valid, but for now this will suffice
 			//userName.setString(user);
@@ -162,11 +183,9 @@ UserData LoginScene::processEvents(sf::Event& evt, sf::RenderWindow& window, Net
 			userObject->userNameStorage = user;
 			userObject->passwordStorage = password;
 
+			// Connect to our server and send the server our username and password
 			netMan.connectToServer(user, MD5(password).hexdigest());
-
-			//Login scene fulfills its role.  changeToGame() function called to update the flag so that the 
-			//Scene* object in main.cpp can be re-assigned to a GameScene object!
-			userObject->changeToGame();
+			infoSent = true;
 		}
 	}
 

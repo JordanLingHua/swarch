@@ -57,16 +57,24 @@ void NetworkManager::networkInput()
 			}
 			else
 			{
-				clientLock.lock();
-					for(auto it = clientList.begin(); it != clientList.end(); it++)
+				for(auto it = clientList.begin(); it != clientList.end(); it++)
+				{
+					if(selector.isReady((**it)))
 					{
-						if(selector.isReady((**it)))
+						// Read the packet in
+						sf::Packet pkt;
+						if((**it).receive(pkt) == sf::TcpSocket::Disconnected)
 						{
-							// Read the packet in
-							sf::Packet pkt;
-
-							(**it).receive(pkt);
-
+							selector.remove(**it);
+							auto itToErase = it;
+							it++;
+							delete (*itToErase);
+							clientList.erase(itToErase);
+							std::cout << "A client has disconnected" << std::endl;
+							continue;
+						}
+						else
+						{
 							std::string user, pass;
 							if(pkt >> user >> pass)
 							{
@@ -90,16 +98,16 @@ void NetworkManager::networkInput()
 								{
 									// The user doesn't exist, create the entry!
 									dm.insertEntry(user, pass);
-
+									
 									// Send a yes to the client
-										sf::Packet packet;
-										packet << "y";
-										(**it).send(packet);
+									sf::Packet packet;
+									packet << "y";
+									(**it).send(packet);
 								}
 							}
 						}
 					}
-				clientLock.unlock();
+				}
 			}
 		}
 	}
@@ -114,24 +122,6 @@ void NetworkManager::run()
 	{
 		done = true;
 	}
-
-	clientLock.lock();
-
-		// Check to see if any clients have disconnected and remove them
-		for(auto it = clientList.begin(); it != clientList.end(); it++)
-		{
-			if((*it)->getRemoteAddress() == sf::IpAddress::None)
-			{
-				auto itToErase = it;
-				it++;
-				delete (*itToErase);
-				clientList.erase(itToErase);
-				std::cout << "A client has disconnected" << std::endl;
-				continue;
-			}
-		}
-
-	clientLock.unlock();
 }
 
 bool NetworkManager::isProgramDone()

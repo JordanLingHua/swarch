@@ -88,6 +88,8 @@ int main()
 			//readThread.launch();
 			//writeThread.launch();
 		}*/
+
+		netMan.receiveMessagesFromServer();
 	}
 
 	// Delete the scene upon closing
