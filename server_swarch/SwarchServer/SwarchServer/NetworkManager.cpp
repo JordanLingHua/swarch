@@ -24,7 +24,7 @@ NetworkManager::~NetworkManager(void)
 	}
 }
 
-void NetworkManager::networkInput()
+void NetworkManager::userJoin()
 {
 	std::cout << "Accepting input" << std::endl;
 
@@ -55,64 +55,66 @@ void NetworkManager::networkInput()
 					delete client;
 				}
 			}
+		}
+	}
+
+	std::cout << "Ending thread" << std::endl;
+}
+
+void NetworkManager::readFromUsers()
+{
+	while(!done)
+	{
+		// Go through each client and check for messages
+		for(auto it = clientList.begin(); it != clientList.end(); it++)
+		{
+			// Read the packet in
+			sf::Packet pkt;
+			if((**it).receive(pkt) == sf::TcpSocket::Disconnected)
+			{
+				selector.remove(**it);
+				auto itToErase = it;
+				it++;
+				delete (*itToErase);
+				clientList.erase(itToErase);
+				std::cout << "A client has disconnected" << std::endl;
+				continue;
+			}
 			else
 			{
-				for(auto it = clientList.begin(); it != clientList.end(); it++)
+				std::string user, pass;
+				if(pkt >> user >> pass)
 				{
-					if(selector.isReady((**it)))
+					if(dm.doesUserExistInDB(user))
 					{
-						// Read the packet in
-						sf::Packet pkt;
-						if((**it).receive(pkt) == sf::TcpSocket::Disconnected)
+						// Check to see if the password matches
+						if(dm.doesPasswordMatchUser(user, pass))
 						{
-							selector.remove(**it);
-							auto itToErase = it;
-							it++;
-							delete (*itToErase);
-							clientList.erase(itToErase);
-							std::cout << "A client has disconnected" << std::endl;
-							continue;
+							sf::Packet packet;
+							packet << "y";
+							(**it).send(packet);
 						}
 						else
 						{
-							std::string user, pass;
-							if(pkt >> user >> pass)
-							{
-								if(dm.doesUserExistInDB(user))
-								{
-									// Check to see if the password matches
-									if(dm.doesPasswordMatchUser(user, pass))
-									{
-										sf::Packet packet;
-										packet << "y";
-										(**it).send(packet);
-									}
-									else
-									{
-										sf::Packet packet;
-										packet << "n";
-										(**it).send(packet);
-									}
-								}
-								else
-								{
-									// The user doesn't exist, create the entry!
-									dm.insertEntry(user, pass);
-									
-									// Send a yes to the client
-									sf::Packet packet;
-									packet << "y";
-									(**it).send(packet);
-								}
-							}
+							sf::Packet packet;
+							packet << "n";
+							(**it).send(packet);
 						}
+					}
+					else
+					{
+						// The user doesn't exist, create the entry!
+						dm.insertEntry(user, pass);
+									
+						// Send a yes to the client
+						sf::Packet packet;
+						packet << "y";
+						(**it).send(packet);
 					}
 				}
 			}
 		}
 	}
-
-	std::cout << "Ending thread" << std::endl;
 }
 
 void NetworkManager::run()

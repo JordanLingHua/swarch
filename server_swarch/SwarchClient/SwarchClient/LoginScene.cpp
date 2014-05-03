@@ -91,6 +91,7 @@ void LoginScene::update(float deltaTime, NetworkManager& netMan)
 			projectedPassword = "";
 
 			netMan.disconnectFromServer();//We added disconnect so we won't cause memory leaks from having the client connect and then not go into the game
+			infoSent = false;
 		}
 	}
 }

@@ -15,7 +15,8 @@ public:
 	NetworkManager(void);
 	~NetworkManager(void);
 
-	void networkInput();
+	void userJoin();
+	void readFromUsers();
 	void run();
 	bool isProgramDone();
 
