@@ -25,6 +25,10 @@ public:
 	// Inserts a new user into the database along with a password and a preset score of 0
 	void insertEntry(std::string userName, std::string passWord);
 
+	bool doesTableExistInDB();
+
+	void createTable();
+
 private:
 	sqlite3 *db;
 	sqlite3_stmt *stmt;

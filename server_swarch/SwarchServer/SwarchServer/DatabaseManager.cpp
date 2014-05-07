@@ -196,3 +196,73 @@ void DatabaseManager::insertEntry(std::string userName, std::string passWord)
 	// sqlite3_finalize() frees up our SQL statement that we set up in sqlite3_prepare_v2()
 	sqlite3_finalize(stmt);
 }
+
+bool DatabaseManager::doesTableExistInDB()
+{
+	// Construct a query that will insert a new user into our database
+	// The query we are using inserts a new entry based on username, password and score
+	std::string query = "SELECT COUNT(*) FROM swarchTable";
+
+	// Prepares the SQL Query for use
+	error = sqlite3_prepare_v2(db, query.c_str(), query.length(), &stmt, &tail);
+
+	// If the SQL file wasn't prepared correctly, exit the method
+	if(error != SQLITE_OK)
+	{
+		std::cout << "Couldn't prepare sql" << std::endl;
+		sqlite3_finalize(stmt);
+		return false;
+	}
+
+	// Run our SQL program
+	if(sqlite3_step(stmt) == SQLITE_ROW)
+	{
+		int count = sqlite3_column_int(stmt, 0);
+		std::cout << count << std::endl;
+
+		// If there is a password, return true
+		if(count >= 0)
+		{
+			std::cout << "The table exists!" << std::endl;
+			sqlite3_finalize(stmt);
+			return true;
+		}
+	}
+
+	std::cout << "The table doesn't exist" << std::endl;
+
+	// sqlite3_finalize() frees up our SQL statement that we set up in sqlite3_prepare_v2()
+	sqlite3_finalize(stmt);
+
+	return false;
+}
+
+void DatabaseManager::createTable()
+{
+	// Construct a query that will create a table in our database
+	std::string query = "CREATE TABLE swarchTable(userName VARCHAR(50), passWord VARCHAR(50), score INT)";
+
+	// Prepares the SQL Query for use
+	error = sqlite3_prepare_v2(db, query.c_str(), query.length(), &stmt, &tail);
+
+	// If the SQL file wasn't prepared correctly, exit the method
+	if(error != SQLITE_OK)
+	{
+		std::cout << "Couldn't prepare sql" << std::endl;
+		sqlite3_finalize(stmt);
+		return;
+	}
+
+	// Run our SQL program
+	if(sqlite3_step(stmt) == SQLITE_ERROR)
+	{
+		std::cout << "Table failed to create" << std::endl;
+		sqlite3_finalize(stmt);
+		return;
+	}
+
+	std::cout << "Table created" << std::endl;
+
+	// sqlite3_finalize() frees up our SQL statement that we set up in sqlite3_prepare_v2()
+	sqlite3_finalize(stmt);
+}

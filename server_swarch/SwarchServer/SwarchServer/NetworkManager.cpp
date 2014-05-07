@@ -10,6 +10,11 @@ NetworkManager::NetworkManager(void)
 	// The listener will allow us to parse messages based on whether a player is trying to join
 	// or if the player is trying to send us a message
 	selector.add(listener);
+
+	if(!dm.doesTableExistInDB())
+	{
+		dm.createTable();
+	}
 }
 
 
