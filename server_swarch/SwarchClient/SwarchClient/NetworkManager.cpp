@@ -1,5 +1,7 @@
 #include "NetworkManager.h"
 
+//**Using readqueue and writequeue objects to control packet send and receive.  
+
 
 NetworkManager::NetworkManager(void)
 	:socket(nullptr), portNum(4682), isConnected(false), threadsCreated(false)
@@ -11,13 +13,10 @@ NetworkManager::NetworkManager(void)
 
 NetworkManager::~NetworkManager(void)
 {
-	if(isConnected)
-	{
-		isConnected = false;
+	//We need both the destructor and the disconnectFromServer(), but
+	//since the code was syntatically the same, we might as well do this.....
+	disconnectFromServer();
 
-		socket->disconnect();
-		delete socket;
-	}
 }
 
 void NetworkManager::connectToServer(std::string username, std::string password)
@@ -38,6 +37,7 @@ void NetworkManager::connectToServer(std::string username, std::string password)
 		delete socket;
 }
 
+//This is not being used right now.  sending done manually for now (ex) like in connectToServer)
 void NetworkManager::sendMessagesToServer()
 {
 	while(isConnected)
@@ -51,6 +51,7 @@ void NetworkManager::sendMessagesToServer()
 	threadsCreated = false;
 }
 
+//Called in the main loop
 void NetworkManager::receiveMessagesFromServer()
 {
 	if(isConnected)
@@ -58,8 +59,10 @@ void NetworkManager::receiveMessagesFromServer()
 		sf::Packet pkt;
 		socket->receive(pkt);
 
+		//if the packet isn't empty
 		if(!pkt.endOfPacket())
 		{
+			//grab from the packet and put into our readQueue queue field for this network manager object.  
 			readQueue.push(pkt);
 		}
 	}

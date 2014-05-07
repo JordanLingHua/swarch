@@ -5,6 +5,8 @@
 #include <SFML/System.hpp>
 #include <queue>
 
+
+//This is just our object that reads and writes packets to the server...:D
 class NetworkManager
 {
 public:

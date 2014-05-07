@@ -72,9 +72,11 @@ void LoginScene::update(float deltaTime, NetworkManager& netMan)
 
 	if(infoSent && !netMan.readQueue.empty())
 	{
+		//Extract the packet
 		sf::Packet pkt = netMan.readQueue.front();
 		netMan.readQueue.pop();
 
+		//read the command in that extracted packet
 		std::string cmd;
 		pkt >> cmd;
 
@@ -86,10 +88,14 @@ void LoginScene::update(float deltaTime, NetworkManager& netMan)
 		}
 		else if(cmd.compare("n") == 0)
 		{
+			//Reset the user and password in loginscene so you have to retype!
 			user = "";
 			password = "";
 			projectedPassword = "";
 
+			//
+			//Disconnect is the ONLY WAY to allow the server to re-read to authenticate again.  Without this, 
+			//Client will NEVER be able to go to gamescene because client will always be seen as invalid by server!!!!
 			netMan.disconnectFromServer();//We added disconnect so we won't cause memory leaks from having the client connect and then not go into the game
 			infoSent = false;
 		}
