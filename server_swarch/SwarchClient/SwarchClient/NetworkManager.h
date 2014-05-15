@@ -26,6 +26,10 @@ public:
 	{
 		return threadsCreated;
 	}
+	bool removeThreads()
+	{
+		return deleteThreads;
+	}
 	void threadsMade()
 	{
 		threadsCreated = true;
@@ -37,7 +41,7 @@ private:
 	sf::TcpSocket* socket;
 	sf::IpAddress ip;
 	int portNum;
-	bool isConnected, threadsCreated;
+	bool isConnected, threadsCreated, deleteThreads;
 };
 
 #endif // NETWORKMANAGER_H

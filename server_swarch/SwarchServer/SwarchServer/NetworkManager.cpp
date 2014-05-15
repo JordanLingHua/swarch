@@ -11,6 +11,8 @@ NetworkManager::NetworkManager(void)
 	// or if the player is trying to send us a message
 	selector.add(listener);
 
+	// Check to see if the table exists in the database
+	// If not, create a table!
 	if(!dm.doesTableExistInDB())
 	{
 		dm.createTable();
@@ -22,7 +24,6 @@ NetworkManager::~NetworkManager(void)
 {
 	done = true;
 
-	// If we haven't deleted all of the sockets, delete them
 	for(auto it = clientList.begin(); it != clientList.end(); it++)
 	{
 		delete *it;
@@ -49,7 +50,8 @@ void NetworkManager::userJoin()
 				{
 					std::cout << "A client has joined the server" << std::endl;
 					selector.add(*client);
-					clientList.push_back(client);
+					Player* p = new Player(client, 1);
+					clientList.push_back(p);
 
 					// Allow for input without threading
 					client->setBlocking(false);
@@ -66,27 +68,57 @@ void NetworkManager::userJoin()
 	std::cout << "Ending thread" << std::endl;
 }
 
-void NetworkManager::readFromUsers()
+void NetworkManager::run(float deltaTime)
 {
-	while(!done)
+	//std::cout << "The deltaTime is: " << deltaTime << std::endl;
+
+	// If we press the escape key, end the simulation
+	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
 	{
-		// Go through each client and check for messages
-		for(auto it = clientList.begin(); it != clientList.end(); it++)
+		done = true;
+	}
+
+	gameProcess();
+
+	processInput();
+}
+
+bool NetworkManager::isProgramDone()
+{
+	return done;
+}
+
+void NetworkManager::processInput()
+{
+	// Go through each client
+	for(auto it = clientList.begin(); it != clientList.end(); it++)
+	{
+		// Check if we need to remove the client
+		if((**it).isPlayerDisconnected)
 		{
-			// Read the packet in
-			sf::Packet pkt;
-			if((**it).receive(pkt) == sf::TcpSocket::Disconnected)
+			selector.remove(*(**it).socket);
+			auto itToErase = it;
+			it++;
+			(*itToErase)->endPlayer();
+			delete *itToErase;
+			clientList.erase(itToErase);
+			std::cout << "A client has disconnected" << std::endl;
+			continue;
+		}
+		// Process client messages
+		else
+		{
+			// If there are messages from this client
+			if(!(**it).readQueue.empty())
 			{
-				selector.remove(**it);
-				auto itToErase = it;
-				it++;
-				delete (*itToErase);
-				clientList.erase(itToErase);
-				std::cout << "A client has disconnected" << std::endl;
-				continue;
-			}
-			else
-			{
+				// Get the message
+				sf::Packet pkt = (**it).readQueue.front();
+				
+				(**it).readLock.lock();
+				(**it).readQueue.pop();
+				(**it).readLock.unlock();
+
+				// Get the code and figure out what to do with the message
 				std::string user, pass;
 				if(pkt >> user >> pass)
 				{
@@ -97,24 +129,32 @@ void NetworkManager::readFromUsers()
 						{
 							sf::Packet packet;
 							packet << "y";
-							(**it).send(packet);
+
+							(**it).writeLock.lock();
+							(**it).writeQueue.push(packet);
+							(**it).writeLock.unlock();
 						}
 						else
 						{
 							sf::Packet packet;
 							packet << "n";
-							(**it).send(packet);
+							(**it).writeLock.lock();
+							(**it).writeQueue.push(packet);
+							(**it).writeLock.unlock();
 						}
 					}
 					else
 					{
 						// The user doesn't exist, create the entry!
 						dm.insertEntry(user, pass);
-									
+								
 						// Send a yes to the client
 						sf::Packet packet;
 						packet << "y";
-						(**it).send(packet);
+						
+						(**it).writeLock.lock();
+						(**it).writeQueue.push(packet);
+						(**it).writeLock.unlock();
 					}
 				}
 			}
@@ -122,16 +162,7 @@ void NetworkManager::readFromUsers()
 	}
 }
 
-void NetworkManager::run()
+void NetworkManager::gameProcess()
 {
-	// If we press the escape key, end the simulation
-	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
-	{
-		done = true;
-	}
-}
 
-bool NetworkManager::isProgramDone()
-{
-	return done;
 }

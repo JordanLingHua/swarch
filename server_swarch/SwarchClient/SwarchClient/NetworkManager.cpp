@@ -49,6 +49,7 @@ void NetworkManager::sendMessagesToServer()
 		}
 	}
 	threadsCreated = false;
+	deleteThreads = true;
 }
 
 //Called in the main loop

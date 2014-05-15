@@ -1,21 +1,10 @@
-﻿Build started 5/7/2014 9:49:48 AM.
+﻿Build started 5/14/2014 11:37:24 AM.
      1>Project "C:\Users\Jonathan\Desktop\Swarch168\swarch\server_swarch\SwarchClient\SwarchClient\SwarchClient.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D _CRT_SECURE_NO_WARNINGS /D SFML_STATIC /D WIN32 /D _DEBUG /D _WINDOWS /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc110.pdb" /Gd /TP /analyze- /errorReport:prompt GameScene.cpp LoginScene.cpp NetworkManager.cpp main.cpp
-         NetworkManager.cpp
-         LoginScene.cpp
-     1>c:\users\jonathan\desktop\swarch168\swarch\server_swarch\swarchclient\swarchclient\userdata.h(4): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-     1>c:\users\jonathan\desktop\swarch168\swarch\server_swarch\swarchclient\swarchclient\loginscene.cpp(175): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
-     1>c:\users\jonathan\desktop\swarch168\swarch\server_swarch\swarchclient\swarchclient\loginscene.cpp(180): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
-     1>c:\users\jonathan\desktop\swarch168\swarch\server_swarch\swarchclient\swarchclient\loginscene.cpp(185): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
-         Generating Code...
-         Compiling...
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D _CRT_SECURE_NO_WARNINGS /D SFML_STATIC /D WIN32 /D _DEBUG /D _WINDOWS /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc110.pdb" /Gd /TP /analyze- /errorReport:prompt NetworkManager.cpp main.cpp
          main.cpp
      1>c:\users\jonathan\desktop\swarch168\swarch\server_swarch\swarchclient\swarchclient\userdata.h(4): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-         GameScene.cpp
-     1>c:\users\jonathan\desktop\swarch168\swarch\server_swarch\swarchclient\swarchclient\userdata.h(4): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-     1>c:\users\jonathan\desktop\swarch168\swarch\server_swarch\swarchclient\swarchclient\gamescene.cpp(42): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
-     1>c:\users\jonathan\desktop\swarch168\swarch\server_swarch\swarchclient\swarchclient\gamescene.cpp(81): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
+         NetworkManager.cpp
          Generating Code...
        Link:
          C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Jonathan\Desktop\Swarch168\swarch\server_swarch\SwarchClient\Debug\SwarchClient.exe" /INCREMENTAL /NOLOGO "sfml-graphics-s-d.lib" "sfml-window-s-d.lib" "sfml-system-s-d.lib" "sfml-audio-s-d.lib" "sfml-network-s-d.lib" "sfml-main-d.lib" kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\Jonathan\Desktop\Swarch168\swarch\server_swarch\SwarchClient\Debug\SwarchClient.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Jonathan\Desktop\Swarch168\swarch\server_swarch\SwarchClient\Debug\SwarchClient.lib" /MACHINE:X86 Debug\GameScene.obj
@@ -24,7 +13,6 @@
          Debug\md5.obj
          Debug\NetworkManager.obj
          Debug\UserData.obj
-         LINK : C:\Users\Jonathan\Desktop\Swarch168\swarch\server_swarch\SwarchClient\Debug\SwarchClient.exe not found or not built by the last incremental link; performing full link
      1>sfml-graphics-s-d.lib(Color.cpp.obj) : warning LNK4099: PDB 'sfml-graphics-s-d.pdb' was not found with 'sfml-graphics-s-d.lib(Color.cpp.obj)' or at 'C:\Users\Jonathan\Desktop\Swarch168\swarch\server_swarch\SwarchClient\Debug\sfml-graphics-s-d.pdb'; linking object as if no debug info
      1>sfml-graphics-s-d.lib(Font.cpp.obj) : warning LNK4099: PDB 'sfml-graphics-s-d.pdb' was not found with 'sfml-graphics-s-d.lib(Font.cpp.obj)' or at 'C:\Users\Jonathan\Desktop\Swarch168\swarch\server_swarch\SwarchClient\Debug\sfml-graphics-s-d.pdb'; linking object as if no debug info
      1>sfml-graphics-s-d.lib(GLCheck.cpp.obj) : warning LNK4099: PDB 'sfml-graphics-s-d.pdb' was not found with 'sfml-graphics-s-d.lib(GLCheck.cpp.obj)' or at 'C:\Users\Jonathan\Desktop\Swarch168\swarch\server_swarch\SwarchClient\Debug\sfml-graphics-s-d.pdb'; linking object as if no debug info
@@ -82,4 +70,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:08.57
+Time Elapsed 00:00:05.20

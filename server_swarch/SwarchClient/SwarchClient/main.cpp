@@ -4,6 +4,7 @@
 
 //Other stuff
 #include "UserData.h"
+#include <list>
 
 //**In this main function, we use ONLY the original 
 //Scene object so that we can simply change the scene object's functionality by
@@ -13,6 +14,8 @@
 
 int main()
 {
+	//std::list<sf::Thread*> threadList;
+
 	NetworkManager netMan;
 
 	// Create the window that will be used for login and gameplay
@@ -82,11 +85,24 @@ int main()
 		/*if(netMan.connectionMade() && !netMan.threadsRunning())
 		{
 			netMan.threadsMade();
-			sf::Thread readThread(&NetworkManager::receiveMessagesFromServer, &netMan);
-			sf::Thread writeThread(&NetworkManager::sendMessagesToServer, &netMan);
+			sf::Thread* readThread = new sf::Thread(&NetworkManager::receiveMessagesFromServer, &netMan);
+			sf::Thread* writeThread = new sf::Thread(&NetworkManager::sendMessagesToServer, &netMan);
 
-			//readThread.launch();
-			//writeThread.launch();
+			readThread->launch();
+			writeThread->launch();
+
+			threadList.push_back(readThread);
+			threadList.push_back(writeThread);
+		}
+
+		if(netMan.removeThreads())
+		{
+			for(auto it = threadList.begin(); it != threadList.end(); it++)
+			{
+				(*it)->terminate();
+
+				delete *it;
+			}
 		}*/
 
 		netMan.receiveMessagesFromServer();
@@ -95,6 +111,12 @@ int main()
 	// Delete the scene upon closing
 	delete currentScene;
 	delete userStuff;
+
+	/*for(auto it = threadList.begin(); it != threadList.end(); it++)
+	{
+		(*it)->terminate();
+		delete *it;
+	}*/
 
 	system("pause");
     return 0;

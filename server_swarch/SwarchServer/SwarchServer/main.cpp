@@ -3,20 +3,20 @@
 
 int main()
 {
-	std::list<sf::Thread*> threadList;
-
 	NetworkManager netMan;
 
 	sf::Thread acceptThread(&NetworkManager::userJoin, &netMan);
-	sf::Thread readThread(&NetworkManager::readFromUsers, &netMan);
 	acceptThread.launch();
-	readThread.launch();
-	threadList.push_back(&acceptThread);
-	threadList.push_back(&readThread);
+
+	sf::Clock deltaTimer;
+	sf::Time lastFrameTime;
 
 	while(!netMan.isProgramDone())
 	{
-		netMan.run();
+		float deltaTime = (deltaTimer.getElapsedTime()-lastFrameTime).asSeconds();
+		lastFrameTime = deltaTimer.getElapsedTime();
+
+		netMan.run(deltaTime);
 	}
 
    system("pause");

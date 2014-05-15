@@ -8,6 +8,7 @@
 #include <iostream>
 
 #include "DatabaseManager.h"
+#include "Player.h"
 
 class NetworkManager
 {
@@ -16,14 +17,21 @@ public:
 	~NetworkManager(void);
 
 	void userJoin();
-	void readFromUsers();
-	void run();
+	void run(float deltaTime);
 	bool isProgramDone();
 
+	bool clientsJoined;
+	sf::Mutex clientJoinLock;
+
 private:
+
+	void processInput();
+	void gameProcess();
+
 	sf::TcpListener listener;
 	sf::SocketSelector selector;
-	std::list<sf::TcpSocket*> clientList;
+	//std::list<sf::TcpSocket*> clientList;
+	std::list<Player*> clientList;
 	bool done;
 
 	DatabaseManager dm;
