@@ -13,6 +13,11 @@
 #define INPUT_COMMAND 0
 #define DIRECTION_COMMAND 1
 
+//Game Logic
+#define NUM_PELLETS 4
+#define WINDOWSIZEX 500
+#define WINDOWSIZEY 500
+
 class NetworkManager
 {
 public:
@@ -29,7 +34,7 @@ public:
 private:
 
 	void processInput();
-	void gameProcess();
+	void gameProcess(float deltaTime);
 
 	sf::TcpListener listener;
 	sf::SocketSelector selector;
@@ -37,6 +42,12 @@ private:
 	bool done;
 	int clientCount;
 	DatabaseManager dm;
+
+	//Game Logic
+	sf::RectangleShape* pelletList;
+	float randPelletLocX;
+	float randPelletLocY;
+
 };
 
 #endif // NETWORKMANAGER_H

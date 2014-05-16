@@ -17,6 +17,23 @@ NetworkManager::NetworkManager(void)
 	{
 		dm.createTable();
 	}
+
+	//needed for game logic
+	pelletList = new sf::RectangleShape[NUM_PELLETS];
+	
+	for(int i = 0; i < NUM_PELLETS; i++)
+	{
+		pelletList[i] = sf::RectangleShape(sf::Vector2f(5,5));
+
+		randPelletLocX = 1+rand()%(WINDOWSIZEX);
+		randPelletLocY = 1+rand()%(WINDOWSIZEY);
+
+
+		pelletList[i].setPosition(randPelletLocX, randPelletLocY);
+	}
+
+
+
 }
 
 
@@ -28,6 +45,8 @@ NetworkManager::~NetworkManager(void)
 	{
 		delete *it;
 	}
+
+	delete[] pelletList;
 }
 
 
@@ -83,7 +102,7 @@ void NetworkManager::run(float deltaTime)
 		done = true;
 	}
 
-	gameProcess();
+	gameProcess(deltaTime);
 
 	processInput();
 }
@@ -199,110 +218,96 @@ void NetworkManager::processInput()
 }
 
 // Handles the game logic
-void NetworkManager::gameProcess()
+void NetworkManager::gameProcess(float deltaTime)
 {
 
-	/*for(auto it = clientList.begin(); it != clientList.end(); it++)
+	for(auto it = clientList.begin(); it != clientList.end(); it++)
 	{
-		//disconnection doesn't need to be checked b/c like this method, processInputs is going to be called 
-		//in the same loop anyways
-		// If there are messages from this client
-		if(!(**it).readQueue.empty())
+		
+		//
+		//move the player's body.  It's movement directions are already getting sent in processInputs
+		(**it).body.move((**it).dirX *(SPEED)* deltaTime,(**it).dirY *(SPEED)*deltaTime);
+
+
+		//Player collision on player
+		for(auto iter = clientList.begin(); iter != clientList.end(); iter++)
 		{
+			if((**it).body.getGlobalBounds().intersects((**iter).body.getGlobalBounds()))
+			{
 
-			//**Direction will ALWAYS be read and sent first before speed is read and sent
-			//As of now, speed is not getting read and sent (05/14/14 5:55pm)
-			// Get the message from the player's readQueue thread
-				sf::Packet dirpkt = (**it).readQueue.front();
-				
-				(**it).readLock.lock();
-				(**it).readQueue.pop();//When you pop, you are popping out a PACKET!!!
-				(**it).readLock.unlock();
-				
-				//extract from dirpkt and assign it into (**it).dirX and (**it).dirY in that order
-				if(dirpkt >> (**it).dirX >> (**it).dirY)//verify if the assignment process for packets returns true //Lots of dereferencing for dirX.  don't know if that's ok
+				if((**it).body.getLocalBounds().width > (**iter).body.getLocalBounds().width )
 				{
+					(**iter).body.setSize(sf::Vector2f(INITIAL_SIZE, INITIAL_SIZE));
+					//(**iter).body.setPosition(sf::Vector2f(WINDOWSIZEX/2 - (**iter).body.getLocalBounds().width/2, WINDOWSIZEY/2 - (**iter).body.getLocalBounds().height/2));
+					(**iter).body.setPosition(sf::Vector2f(1+rand()%(WINDOWSIZEX),1+rand()%(WINDOWSIZEY)));
+				}
+				else if((**it).body.getLocalBounds().width < (**iter).body.getLocalBounds().width )
+				{
+					(**it).body.setSize(sf::Vector2f(INITIAL_SIZE, INITIAL_SIZE));
+					//(**it).body.setPosition(sf::Vector2f(WINDOWSIZEX/2 - (**it).body.getLocalBounds().width/2, WINDOWSIZEY/2 - (**it).body.getLocalBounds().height/2));
+					(**it).body.setPosition(sf::Vector2f(1+rand()%(WINDOWSIZEX),1+rand()%(WINDOWSIZEY)));
+				}
+				else
+				{
+					(**iter).body.setSize(sf::Vector2f(INITIAL_SIZE, INITIAL_SIZE));
+					//(**iter).body.setPosition(sf::Vector2f(WINDOWSIZEX/2 - (**iter).body.getLocalBounds().width/2, WINDOWSIZEY/2 - (**iter).body.getLocalBounds().height/2));
+					(**iter).body.setPosition(sf::Vector2f(1+rand()%(WINDOWSIZEX),1+rand()%(WINDOWSIZEY)));
 
-					//__send dirX first__
-					if((**it).dirX < 0 || (**it).dirX == -1)
-					{
-						//send goLeft
-						sf::Packet packet;
-						//packet << -1;
-						packet << -((**it).dirX);//fixed the dereferencing floating objects//Notice the re-initialization below
-						(**it).writeLock.lock();
-						(**it).writeQueue.push(packet);
-						(**it).writeLock.unlock();
-						(**it).dirX = 0;//re-initialize dirX
-					}
-					else if ((**it).dirX > 0 || (**it).dirX == 1)
-					{
-						//send goRight
-						sf::Packet packet;
-						//packet << 1;
-						packet << (**it).dirX;//fixed the dereferencing floating objects//Notice the re-initialization below
-						(**it).writeLock.lock();
-						(**it).writeQueue.push(packet);
-						(**it).writeLock.unlock();
-						(**it).dirX = 0;//re-initialize dirX
-					}
-					else
-					{
-						//dirX is 0; send dontMoveLeftNORRight
-						sf::Packet packet;
-						packet << 0;
-						(**it).writeLock.lock();
-						(**it).writeQueue.push(packet);
-						(**it).writeLock.unlock();
-					}
-
-
-					//__Send dirY__
-					if((**it).dirY < 0 || (**it).dirY == -1)
-					{
-						//send goLeft
-						sf::Packet packet;
-						//packet << -1;
-						packet << -((**it).dirY);//fixed the dereferencing floating objects//Notice the re-initialization below
-						(**it).writeLock.lock();
-						(**it).writeQueue.push(packet);
-						(**it).writeLock.unlock();
-						(**it).dirY = 0;//re-initialize dirY
-					}
-					else if ((**it).dirY > 0 || (**it).dirY == 1)
-					{
-						//send goRight
-						sf::Packet packet;
-						//packet << 1;
-						packet << (**it).dirY;//fixed the dereferencing floating objects//Notice the re-initialization below
-						(**it).writeLock.lock();
-						(**it).writeQueue.push(packet);
-						(**it).writeLock.unlock();
-						(**it).dirX = 0;//re-initialize dirY
-					}
-					else
-					{
-						//dirY is 0; send dontMoveLeftNORRight
-						sf::Packet packet;
-						packet << 0;
-						(**it).writeLock.lock();
-						(**it).writeQueue.push(packet);
-						(**it).writeLock.unlock();
-					}
-
-
-
+					(**it).body.setSize(sf::Vector2f(INITIAL_SIZE, INITIAL_SIZE));
+					//(**it).body.setPosition(sf::Vector2f(WINDOWSIZEX/2 - (**it).body.getLocalBounds().width/2, WINDOWSIZEY/2 - (**it).body.getLocalBounds().height/2));
+					(**it).body.setPosition(sf::Vector2f(1+rand()%(WINDOWSIZEX),1+rand()%(WINDOWSIZEY)));
 
 				}
 
-				
 
+			}
+		}
+
+		
+		// If my player collides with a pellet
+		for(int pelletCount = 0; pelletCount < NUM_PELLETS; pelletCount++)
+		{
+			if((**it).body.getGlobalBounds().intersects(pelletList[pelletCount].getGlobalBounds()))
+			{
+				// "Delete" the pellet and make a new one
+				randPelletLocX = 1+rand()%(WINDOWSIZEX);
+				randPelletLocY = 1+rand()%(WINDOWSIZEY);
+				pelletList[pelletCount].setPosition(randPelletLocX, randPelletLocY);
+	
+				// Increase the player size
+				(**it).body.setSize(sf::Vector2f((**it).body.getSize().x + 2, (**it).body.getSize().y+2));
+				std::cout << "Client " << (**it).socket->getRemoteAddress().toString() << " has collided with and ate a pellet!" << std::endl;
+
+			}
+		}
+
+
+
+
+
+		if((**it).body.getGlobalBounds().top < 0 || (**it).body.getGlobalBounds().top +(**it).body.getGlobalBounds().height > WINDOWSIZEY ||
+		(**it).body.getGlobalBounds().left < 0 || (**it).body.getGlobalBounds().left + (**it).body.getGlobalBounds().width > WINDOWSIZEX)
+		{
+			// Resize the player and set them to the center of the screen
+			(**it).body.setSize(sf::Vector2f(INITIAL_SIZE, INITIAL_SIZE));
+			(**it).body.setPosition(sf::Vector2f(WINDOWSIZEX/2 - (**it).body.getLocalBounds().width/2, WINDOWSIZEY/2 - (**it).body.getLocalBounds().height/2));
+			//delay = 0.0f;
+
+
+			std::cout << "Client " << (**it).socket->getRemoteAddress().toString() << " has hit a wall!" << std::endl;
 
 		}
+
+
+		
+		
+		
+
+
 
 
 	}
 
 
-	*/
+	
 }

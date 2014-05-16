@@ -19,6 +19,7 @@ int main()
 		float deltaTime = (deltaTimer.getElapsedTime()-lastFrameTime).asSeconds();
 		lastFrameTime = deltaTimer.getElapsedTime();
 
+		//Execute networkManager's functions
 		netMan.run(deltaTime);
 	}
 
