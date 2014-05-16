@@ -30,6 +30,8 @@ NetworkManager::~NetworkManager(void)
 	}
 }
 
+
+//Multithreading added in milestone 4 to allow multiple users join //delete comment if causes problems
 void NetworkManager::userJoin()
 {
 	std::cout << "Accepting input" << std::endl;
@@ -94,7 +96,7 @@ void NetworkManager::processInput()
 	for(auto it = clientList.begin(); it != clientList.end(); it++)
 	{
 		// Check if we need to remove the client
-		if((**it).isPlayerDisconnected)
+		if((**it).isPlayerDisconnected)//**it's are player objects
 		{
 			selector.remove(*(**it).socket);
 			auto itToErase = it;
@@ -164,5 +166,108 @@ void NetworkManager::processInput()
 
 void NetworkManager::gameProcess()
 {
+
+	for(auto it = clientList.begin(); it != clientList.end(); it++)
+	{
+		//disconnection doesn't need to be checked b/c like this method, processInputs is going to be called 
+		//in the same loop anyways
+		// If there are messages from this client
+		if(!(**it).readQueue.empty())
+		{
+
+			//**Direction will ALWAYS be read and sent first before speed is read and sent
+			//As of now, speed is not getting read and sent (05/14/14 5:55pm)
+			// Get the message from the player's readQueue thread
+				sf::Packet dirpkt = (**it).readQueue.front();
+				
+				(**it).readLock.lock();
+				(**it).readQueue.pop();//When you pop, you are popping out a PACKET!!!
+				(**it).readLock.unlock();
+				
+				//extract from dirpkt and assign it into (**it).dirX and (**it).dirY in that order
+				if(dirpkt >> (**it).dirX >> (**it).dirY)//verify if the assignment process for packets returns true //Lots of dereferencing for dirX.  don't know if that's ok
+				{
+
+					//__send dirX first__
+					if((**it).dirX < 0 || (**it).dirX == -1)
+					{
+						//send goLeft
+						sf::Packet packet;
+						//packet << -1;
+						packet << -((**it).dirX);//fixed the dereferencing floating objects//Notice the re-initialization below
+						(**it).writeLock.lock();
+						(**it).writeQueue.push(packet);
+						(**it).writeLock.unlock();
+						(**it).dirX = 0;//re-initialize dirX
+					}
+					else if ((**it).dirX > 0 || (**it).dirX == 1)
+					{
+						//send goRight
+						sf::Packet packet;
+						//packet << 1;
+						packet << (**it).dirX;//fixed the dereferencing floating objects//Notice the re-initialization below
+						(**it).writeLock.lock();
+						(**it).writeQueue.push(packet);
+						(**it).writeLock.unlock();
+						(**it).dirX = 0;//re-initialize dirX
+					}
+					else
+					{
+						//dirX is 0; send dontMoveLeftNORRight
+						sf::Packet packet;
+						packet << 0;
+						(**it).writeLock.lock();
+						(**it).writeQueue.push(packet);
+						(**it).writeLock.unlock();
+					}
+
+
+					//__Send dirY__
+					if((**it).dirY < 0 || (**it).dirY == -1)
+					{
+						//send goLeft
+						sf::Packet packet;
+						//packet << -1;
+						packet << -((**it).dirY);//fixed the dereferencing floating objects//Notice the re-initialization below
+						(**it).writeLock.lock();
+						(**it).writeQueue.push(packet);
+						(**it).writeLock.unlock();
+						(**it).dirY = 0;//re-initialize dirY
+					}
+					else if ((**it).dirY > 0 || (**it).dirY == 1)
+					{
+						//send goRight
+						sf::Packet packet;
+						//packet << 1;
+						packet << (**it).dirY;//fixed the dereferencing floating objects//Notice the re-initialization below
+						(**it).writeLock.lock();
+						(**it).writeQueue.push(packet);
+						(**it).writeLock.unlock();
+						(**it).dirX = 0;//re-initialize dirY
+					}
+					else
+					{
+						//dirY is 0; send dontMoveLeftNORRight
+						sf::Packet packet;
+						packet << 0;
+						(**it).writeLock.lock();
+						(**it).writeQueue.push(packet);
+						(**it).writeLock.unlock();
+					}
+
+
+
+
+				}
+
+				
+
+
+		}
+
+
+	}
+
+
 
 }

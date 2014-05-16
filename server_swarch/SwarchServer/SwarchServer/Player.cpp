@@ -1,6 +1,9 @@
 #include "Player.h"
 #include <iostream>
 
+
+//All of these called for each player object inside netman //delete comment if causes problems
+
 Player::Player(sf::TcpSocket* socket, int number)
 	:startingPos(500.f,500.f), socket(socket), isPlayerDisconnected(false), read(&Player::readFromClient, this), 
 	write(&Player::writeToClient, this), score(0), playerNum(number), isReadDone(false), isWriteDone(false)
