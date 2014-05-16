@@ -8,7 +8,7 @@
 
 #define WINDOWSIZEX 500
 #define WINDOWSIZEY 500
-#define SPEED 200.0f
+#define SPEED 50.0f
 #define PLAYERSIZE 10
 
 // The GameScene is a type of Scene in which users can play Swarch
@@ -33,6 +33,7 @@ private:
 	float delay, dx, dy;
 	int randPelletLocX, randPelletLocY, numOfPellets;
 	sf::RectangleShape* pelletList, myBox;
+	bool upPress, downPress, rightPress, leftPress;
 };
 
 #endif // GAMESCENE_H

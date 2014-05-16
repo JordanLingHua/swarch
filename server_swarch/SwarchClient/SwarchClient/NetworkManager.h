@@ -4,7 +4,9 @@
 #include <SFML/Network.hpp>
 #include <SFML/System.hpp>
 #include <queue>
+#include "TcpThreader.h"
 
+#define USER_INFO_CODE 0
 
 //This is just our object that reads and writes packets to the server...:D
 class NetworkManager
@@ -14,8 +16,6 @@ public:
 	~NetworkManager(void);
 
 	void connectToServer(std::string username, std::string password);
-	void sendMessagesToServer();
-	void receiveMessagesFromServer();
 	void disconnectFromServer();
 	
 	bool connectionMade()
@@ -35,10 +35,10 @@ public:
 		threadsCreated = true;
 	}
 
-	std::queue<sf::Packet> writeQueue, readQueue;
+	TcpThreader* tcpThread;
+	int clientNum;
 
 private:
-	sf::TcpSocket* socket;
 	sf::IpAddress ip;
 	int portNum;
 	bool isConnected, threadsCreated, deleteThreads;

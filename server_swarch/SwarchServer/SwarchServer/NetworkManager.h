@@ -10,6 +10,9 @@
 #include "DatabaseManager.h"
 #include "Player.h"
 
+#define INPUT_COMMAND 0
+#define DIRECTION_COMMAND 1
+
 class NetworkManager
 {
 public:
@@ -30,10 +33,9 @@ private:
 
 	sf::TcpListener listener;
 	sf::SocketSelector selector;
-	//std::list<sf::TcpSocket*> clientList;
 	std::list<Player*> clientList;
 	bool done;
-
+	int clientCount;
 	DatabaseManager dm;
 };
 

@@ -4,7 +4,7 @@
 
 
 NetworkManager::NetworkManager(void)
-	:socket(nullptr), portNum(4682), isConnected(false), threadsCreated(false)
+	:portNum(4682), isConnected(false), threadsCreated(false), clientNum(-1)
 {
 	ip = sf::IpAddress::getLocalAddress();
 	//ip = sf::IpAddress("###.###.###.###");
@@ -21,52 +21,25 @@ NetworkManager::~NetworkManager(void)
 
 void NetworkManager::connectToServer(std::string username, std::string password)
 {
-	socket = new sf::TcpSocket;
+	sf::TcpSocket* socket = new sf::TcpSocket;
 	if(socket->connect(ip, portNum) == sf::TcpSocket::Done)//if server acknowledges back with a done(which indicates we connected)
 	{
 		socket->setBlocking(false);
 
+		tcpThread = new TcpThreader(socket);
+
 		sf::Packet pkt;
 
-		pkt << username << password;//when this function is called in main.cpp, send the username and password passed in
-		socket->send(pkt);
+		pkt << USER_INFO_CODE << username << password;//when this function is called in main.cpp, send the username and password passed in
+		
+		tcpThread->writeLock.lock();
+		tcpThread->writeQueue.push(pkt);
+		tcpThread->writeLock.unlock();
 
 		isConnected = true;
 	}
 	else
 		delete socket;
-}
-
-//This is not being used right now.  sending done manually for now (ex) like in connectToServer)
-void NetworkManager::sendMessagesToServer()
-{
-	while(isConnected)
-	{
-		while(!writeQueue.empty())
-		{
-			socket->send(writeQueue.front());
-			writeQueue.pop();
-		}
-	}
-	threadsCreated = false;
-	deleteThreads = true;
-}
-
-//Called in the main loop
-void NetworkManager::receiveMessagesFromServer()
-{
-	if(isConnected)
-	{
-		sf::Packet pkt;
-		socket->receive(pkt);
-
-		//if the packet isn't empty
-		if(!pkt.endOfPacket())
-		{
-			//grab from the packet and put into our readQueue queue field for this network manager object.  
-			readQueue.push(pkt);
-		}
-	}
 }
 
 void NetworkManager::disconnectFromServer()
@@ -75,7 +48,7 @@ void NetworkManager::disconnectFromServer()
 	{
 		isConnected = false;
 
-		socket->disconnect();
-		delete socket;
+		tcpThread->disconnect();
+		delete tcpThread;
 	}
 }

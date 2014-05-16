@@ -9,7 +9,7 @@
 */
 
 GameScene::GameScene(std::string username)
-	:delay(0), dx(0), dy(1), numOfPellets(4)
+	:delay(0), dx(0), dy(1), numOfPellets(4), upPress(false), downPress(false), rightPress(false), leftPress(false)
 {
 	// We must load a font as SFML doesn't provide a default font to use
 	font.loadFromFile("arial.ttf");
@@ -53,21 +53,53 @@ GameScene::~GameScene(void)
 void GameScene::update(float deltaTime, NetworkManager& netMan)
 {
 	// Get the input from the user to calculate direction
-	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up) && dy != -1.0f && !upPress)
 	{
-		dx = 0, dy = -1;
+		dx = 0.0f, dy = -1.0f;
+		sf::Packet pkt;
+		pkt << 1 << netMan.clientNum << dx << dy;
+
+		netMan.tcpThread->writeLock.lock();
+		netMan.tcpThread->writeQueue.push(pkt);
+		netMan.tcpThread->writeLock.unlock();
+		
+		upPress = true;
 	}
-	else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+	else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down) && dy != 1.0f && !downPress)
 	{
-		dx = 0, dy = 1;
+		dx = 0.0f, dy = 1.0f;
+		sf::Packet pkt;
+		pkt << 1 << netMan.clientNum << dx << dy;
+
+		netMan.tcpThread->writeLock.lock();
+		netMan.tcpThread->writeQueue.push(pkt);
+		netMan.tcpThread->writeLock.unlock();
+
+		downPress = true;
 	}
-	else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+	else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right) && dx != 1.0f && !rightPress)
 	{
-		dx = 1, dy = 0;
+		dx = 1.0f, dy = 0.0f;
+		sf::Packet pkt;
+		pkt << 1 << netMan.clientNum << dx << dy;
+
+		netMan.tcpThread->writeLock.lock();
+		netMan.tcpThread->writeQueue.push(pkt);
+		netMan.tcpThread->writeLock.unlock();
+
+		rightPress = true;
 	}
-	else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+	else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left) && dx != -1.0f && !leftPress)
 	{
-		dx = -1, dy = 0;
+		dx = -1.0f, dy = 0.0f;
+		sf::Packet pkt;
+		pkt << 1 << netMan.clientNum << dx << dy;
+
+		netMan.tcpThread->writeLock.lock();
+		netMan.tcpThread->writeQueue.push(pkt);
+		netMan.tcpThread->writeLock.unlock();
+
+		leftPress = true;
 	}
 
 	// If my player collides with a pellet
@@ -92,17 +124,22 @@ void GameScene::update(float deltaTime, NetworkManager& netMan)
 		// Resize the player and set them to the center of the screen
 		myBox.setSize(sf::Vector2f(PLAYERSIZE,PLAYERSIZE));
 		myBox.setPosition(sf::Vector2f(WINDOWSIZEX/2 - myBox.getLocalBounds().width/2, WINDOWSIZEY/2 - myBox.getLocalBounds().height/2));
-		delay = 0;
+		delay = 0.0f;
 	}
 
 	// Not a good delay as speeds may vary between computers
 	// We are using the TA's implementation
-	delay -= 4;
+	delay = delay - deltaTime;
 
-	if(delay <= 0)
+	if(delay < 1.0f)
 	{
-		myBox.move(dx*SPEED*deltaTime, dy*SPEED*deltaTime);
-		delay = (myBox.getLocalBounds().width - 10) / 2;
+		myBox.move(dx*deltaTime*SPEED, dy*deltaTime*SPEED);
+		delay = (myBox.getLocalBounds().width - 10.0f) / 2.0f;
+	}
+	else
+	{
+		myBox.move(dx, dy);
+		delay = (myBox.getLocalBounds().width - 10.0f) / 2.0f;
 	}
 }
 
@@ -122,6 +159,26 @@ UserData GameScene::processEvents(sf::Event& evt, sf::RenderWindow& window, Netw
 	UserData user("","");
 	if (evt.type == sf::Event::Closed)
 		window.close();
+	if(evt.type == sf::Event::KeyReleased)
+	{
+		if(evt.key.code == sf::Keyboard::Up)
+		{
+			upPress = false;
+		}
+		if(evt.key.code == sf::Keyboard::Down)
+		{
+			downPress = false;
+		}
+		if(evt.key.code == sf::Keyboard::Right)
+		{
+			rightPress = false;
+		}
+		if(evt.key.code == sf::Keyboard::Left)
+		{
+			leftPress = false;
+		}
+	}
+
 
 	if(sf::Keyboard::isKeyPressed(sf::Keyboard::BackSpace))
 	{

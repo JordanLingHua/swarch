@@ -81,42 +81,11 @@ int main()
 			//you get to switch between different variants of the scene object.  
 			userStuff->startLogin = false;
 		}
-
-		/*if(netMan.connectionMade() && !netMan.threadsRunning())
-		{
-			netMan.threadsMade();
-			sf::Thread* readThread = new sf::Thread(&NetworkManager::receiveMessagesFromServer, &netMan);
-			sf::Thread* writeThread = new sf::Thread(&NetworkManager::sendMessagesToServer, &netMan);
-
-			readThread->launch();
-			writeThread->launch();
-
-			threadList.push_back(readThread);
-			threadList.push_back(writeThread);
-		}
-
-		if(netMan.removeThreads())
-		{
-			for(auto it = threadList.begin(); it != threadList.end(); it++)
-			{
-				(*it)->terminate();
-
-				delete *it;
-			}
-		}*/
-
-		netMan.receiveMessagesFromServer();
 	}
 
 	// Delete the scene upon closing
 	delete currentScene;
 	delete userStuff;
-
-	/*for(auto it = threadList.begin(); it != threadList.end(); it++)
-	{
-		(*it)->terminate();
-		delete *it;
-	}*/
 
 	system("pause");
     return 0;

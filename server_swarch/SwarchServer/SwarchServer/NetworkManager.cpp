@@ -2,7 +2,7 @@
 
 
 NetworkManager::NetworkManager(void)
-	:done(false)
+	:done(false), clientCount(0)
 {
 	// Choose a port to listen to
 	listener.listen(4682);
@@ -52,8 +52,11 @@ void NetworkManager::userJoin()
 				{
 					std::cout << "A client has joined the server" << std::endl;
 					selector.add(*client);
-					Player* p = new Player(client, 1);
+					Player* p = new Player(client, ++clientCount);
+					
+					clientJoinLock.lock();
 					clientList.push_back(p);
+					clientJoinLock.unlock();
 
 					// Allow for input without threading
 					client->setBlocking(false);
@@ -90,9 +93,12 @@ bool NetworkManager::isProgramDone()
 	return done;
 }
 
+// Handles user input to the server
 void NetworkManager::processInput()
 {
 	// Go through each client
+	clientJoinLock.lock();
+	
 	for(auto it = clientList.begin(); it != clientList.end(); it++)
 	{
 		// Check if we need to remove the client
@@ -121,16 +127,22 @@ void NetworkManager::processInput()
 				(**it).readLock.unlock();
 
 				// Get the code and figure out what to do with the message
-				std::string user, pass;
-				if(pkt >> user >> pass)
+				int code;
+				pkt >> code;
+				
+				// If a user info code
+				if(code == 0)
 				{
+					std::string user, pass;
+					pkt >> user >> pass;
+					sf::Packet packet;
+					packet << INPUT_COMMAND;
 					if(dm.doesUserExistInDB(user))
 					{
 						// Check to see if the password matches
 						if(dm.doesPasswordMatchUser(user, pass))
 						{
-							sf::Packet packet;
-							packet << "y";
+							packet << "y" << (**it).playerNum;
 
 							(**it).writeLock.lock();
 							(**it).writeQueue.push(packet);
@@ -138,7 +150,6 @@ void NetworkManager::processInput()
 						}
 						else
 						{
-							sf::Packet packet;
 							packet << "n";
 							(**it).writeLock.lock();
 							(**it).writeQueue.push(packet);
@@ -151,23 +162,47 @@ void NetworkManager::processInput()
 						dm.insertEntry(user, pass);
 								
 						// Send a yes to the client
-						sf::Packet packet;
-						packet << "y";
+						packet << "y" << (**it).playerNum;
 						
 						(**it).writeLock.lock();
 						(**it).writeQueue.push(packet);
 						(**it).writeLock.unlock();
 					}
 				}
+				// If it's a directional code
+				else if(code == 1)
+				{
+					int clientNum;
+				//	float posX, posY;
+					pkt >> clientNum >> (**it).dirX >> (**it).dirY;
+
+					std::cout << "The new direction for client " << clientNum << " is: " << (**it).dirX << " , " << (**it).dirY << std::endl;
+
+					// Send the direction to the other clients
+					/*for(auto iter = clientList.begin(); iter != clientList.end(); iter++)
+					{
+						if((**iter).playerNum != clientNum)
+						{
+							sf::Packet packet;
+							packet << 1 << clientNum << (**it).dirX << (**it).dirY;
+
+							(**iter).writeLock.lock();
+							(**iter).writeQueue.push(packet);
+							(**iter).writeLock.unlock();
+						}
+					}*/
+				}
 			}
 		}
 	}
+	clientJoinLock.unlock();
 }
 
+// Handles the game logic
 void NetworkManager::gameProcess()
 {
 
-	for(auto it = clientList.begin(); it != clientList.end(); it++)
+	/*for(auto it = clientList.begin(); it != clientList.end(); it++)
 	{
 		//disconnection doesn't need to be checked b/c like this method, processInputs is going to be called 
 		//in the same loop anyways
@@ -269,5 +304,5 @@ void NetworkManager::gameProcess()
 	}
 
 
-
+	*/
 }

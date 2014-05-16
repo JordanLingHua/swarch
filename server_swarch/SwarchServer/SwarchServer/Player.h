@@ -29,8 +29,8 @@ public:
 
 	sf::Mutex readLock, writeLock;//Everytime we read/write a certain packet,    //delete comment if causes problems
 	int score, playerNum;
-	//float dirX, dirY;
-	int dirX, dirY;
+	float dirX, dirY;
+	//int dirX, dirY;
 	//dirX stores either -1, 0, or 1.  dirY stores either -1, 0, 1  <---Assume client will send these.  
 private:
 	sf::Vector2f startingPos;

@@ -70,34 +70,43 @@ void LoginScene::update(float deltaTime, NetworkManager& netMan)
 	userT.setString(user);
 	passwordT.setString(projectedPassword);
 
-	if(infoSent && !netMan.readQueue.empty())
+	if(infoSent && !netMan.tcpThread->readQueue.empty())
 	{
 		//Extract the packet
-		sf::Packet pkt = netMan.readQueue.front();
-		netMan.readQueue.pop();
+		sf::Packet pkt = netMan.tcpThread->readQueue.front();
+		
+		netMan.tcpThread->readLock.lock();
+		netMan.tcpThread->readQueue.pop();
+		netMan.tcpThread->readLock.unlock();
 
 		//read the command in that extracted packet
-		std::string cmd;
-		pkt >> cmd;
+		int code;
+		pkt >> code;
 
-		if(cmd.compare("y") == 0)
+		if(code == 0)
 		{
-			//Login scene fulfills its role.  changeToGame() function called to update the flag so that the 
-			//Scene* object in main.cpp can be re-assigned to a GameScene object!
-			userObject->changeToGame();
-		}
-		else if(cmd.compare("n") == 0)
-		{
-			//Reset the user and password in loginscene so you have to retype!
-			user = "";
-			password = "";
-			projectedPassword = "";
+			std::string cmd;
+			pkt >> cmd;
+			if(cmd.compare("y") == 0)
+			{
+				pkt >> netMan.clientNum;
+				//Login scene fulfills its role.  changeToGame() function called to update the flag so that the 
+				//Scene* object in main.cpp can be re-assigned to a GameScene object!
+				userObject->changeToGame();
+			}
+			else if(cmd.compare("n") == 0)
+			{
+				//Reset the user and password in loginscene so you have to retype!
+				user = "";
+				password = "";
+				projectedPassword = "";
 
-			//
-			//Disconnect is the ONLY WAY to allow the server to re-read to authenticate again.  Without this, 
-			//Client will NEVER be able to go to gamescene because client will always be seen as invalid by server!!!!
-			netMan.disconnectFromServer();//We added disconnect so we won't cause memory leaks from having the client connect and then not go into the game
-			infoSent = false;
+				//
+				//Disconnect is the ONLY WAY to allow the server to re-read to authenticate again.  Without this, 
+				//Client will NEVER be able to go to gamescene because client will always be seen as invalid by server!!!!
+				netMan.disconnectFromServer();//We added disconnect so we won't cause memory leaks from having the client connect and then not go into the game
+				infoSent = false;
+			}
 		}
 	}
 }
@@ -198,16 +207,3 @@ UserData LoginScene::processEvents(sf::Event& evt, sf::RenderWindow& window, Net
 
 	return *userObject;
 }
-
-
-//
-//std::string LoginScene::getUserName(void)
-//{
-	
-//	return user;
-//}
-//std::string LoginScene::getPassword(void)
-//{
-
-//	return password;
-//}
