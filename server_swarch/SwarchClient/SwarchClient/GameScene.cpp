@@ -253,13 +253,26 @@ void GameScene::processInput(NetworkManager& netMan)
 				int clientNum;
 				pkt >> clientNum;
 
-				for(auto it = playerList.begin(); it != playerList.end(); it++)
+/*				bool isFound = false;
+				for(auto it = playerList.begin(); it != playerList.end() && !isFound; it++)
 				{
 					if((*it).clientNum == clientNum)
 					{
-						auto iterToErase = it;
-						playerList.erase(iterToErase);
-						continue;
+						playerList.erase(it);
+						it=playerList.begin();
+						isFound = true;
+					}
+				}*/
+
+				for(auto it = playerList.begin(); it != playerList.end(); it++)
+				{
+					// Check if we need to remove the client
+					if((*it).clientNum = clientNum)//**it's are player objects
+					{
+						auto itToErase = it;
+						it++;
+						playerList.erase(itToErase);
+						return;
 					}
 				}
 			}
