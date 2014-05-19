@@ -4,7 +4,7 @@
 
 
 NetworkManager::NetworkManager(void)
-	:portNum(4682), isConnected(false), threadsCreated(false), clientNum(-1)
+	:portNum(4682), isConnected(false), threadsCreated(false), clientNum(-1), update(true)
 {
 	ip = sf::IpAddress::getLocalAddress();
 	//ip = sf::IpAddress("###.###.###.###");
@@ -24,7 +24,7 @@ void NetworkManager::connectToServer(std::string username, std::string password)
 	sf::TcpSocket* socket = new sf::TcpSocket;
 	if(socket->connect(ip, portNum) == sf::TcpSocket::Done)//if server acknowledges back with a done(which indicates we connected)
 	{
-		socket->setBlocking(false);
+		//socket->setBlocking(false);
 
 		tcpThread = new TcpThreader(socket);
 
@@ -50,5 +50,6 @@ void NetworkManager::disconnectFromServer()
 
 		tcpThread->disconnect();
 		delete tcpThread;
+		int temp = 10;
 	}
 }

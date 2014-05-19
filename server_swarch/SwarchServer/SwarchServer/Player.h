@@ -6,8 +6,7 @@
 #include <queue>
 
 #define INITIAL_SIZE 10
-#define STARTINGX 500
-#define STARTINGY 500
+#define WINDOW_SIZE 500
 #define SPEED 20//not worrying about speed in this commit
 
 class Player
@@ -19,6 +18,7 @@ public:
 	void readFromClient();
 	void writeToClient();
 
+	void setRandomPosition();
 	void setScore(int score);
 	void endPlayer();
 

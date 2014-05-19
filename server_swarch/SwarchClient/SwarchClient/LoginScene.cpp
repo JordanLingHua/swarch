@@ -70,7 +70,7 @@ void LoginScene::update(float deltaTime, NetworkManager& netMan)
 	userT.setString(user);
 	passwordT.setString(projectedPassword);
 
-	if(infoSent && !netMan.tcpThread->readQueue.empty())
+	if(infoSent && !netMan.tcpThread->readQueue.empty() && !userObject->startGame)
 	{
 		//Extract the packet
 		sf::Packet pkt = netMan.tcpThread->readQueue.front();
@@ -83,7 +83,7 @@ void LoginScene::update(float deltaTime, NetworkManager& netMan)
 		int code;
 		pkt >> code;
 
-		if(code == 0)
+		if(code == USER_INFO_CODE)
 		{
 			std::string cmd;
 			pkt >> cmd;

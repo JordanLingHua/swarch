@@ -18,7 +18,7 @@ TcpThreader::~TcpThreader()
 	if(!writeDone)
 		write.terminate();
 
-	disconnect();
+	//disconnect();
 
 	delete socket;
 }

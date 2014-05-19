@@ -89,6 +89,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="md5.cpp" />
     <ClCompile Include="NetworkManager.cpp" />
+    <ClCompile Include="NetworkOpponent.cpp" />
     <ClCompile Include="TcpThreader.cpp" />
     <ClCompile Include="UserData.cpp" />
   </ItemGroup>
@@ -97,6 +98,7 @@
     <ClInclude Include="LoginScene.h" />
     <ClInclude Include="md5.h" />
     <ClInclude Include="NetworkManager.h" />
+    <ClInclude Include="NetworkOpponent.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="TcpThreader.h" />
     <ClInclude Include="UserData.h" />

@@ -28,12 +28,9 @@ NetworkManager::NetworkManager(void)
 		randPelletLocX = 1+rand()%(WINDOWSIZEX);
 		randPelletLocY = 1+rand()%(WINDOWSIZEY);
 
-
+		pelletList[i].setOrigin(2.5f, 2.5f);
 		pelletList[i].setPosition(randPelletLocX, randPelletLocY);
 	}
-
-
-
 }
 
 
@@ -72,7 +69,7 @@ void NetworkManager::userJoin()
 					std::cout << "A client has joined the server" << std::endl;
 					selector.add(*client);
 					Player* p = new Player(client, ++clientCount);
-					
+
 					clientJoinLock.lock();
 					clientList.push_back(p);
 					clientJoinLock.unlock();
@@ -94,17 +91,15 @@ void NetworkManager::userJoin()
 
 void NetworkManager::run(float deltaTime)
 {
-	//std::cout << "The deltaTime is: " << deltaTime << std::endl;
-
 	// If we press the escape key, end the simulation
 	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
 	{
 		done = true;
 	}
 
-	gameProcess(deltaTime);
-
 	processInput();
+
+	gameProcess(deltaTime);
 }
 
 bool NetworkManager::isProgramDone()
@@ -127,6 +122,7 @@ void NetworkManager::processInput()
 			auto itToErase = it;
 			it++;
 			(*itToErase)->endPlayer();
+			sendPlayerDisconnect((*itToErase)->playerNum);
 			delete *itToErase;
 			clientList.erase(itToErase);
 			std::cout << "A client has disconnected" << std::endl;
@@ -166,6 +162,9 @@ void NetworkManager::processInput()
 							(**it).writeLock.lock();
 							(**it).writeQueue.push(packet);
 							(**it).writeLock.unlock();
+
+							sendSetup(*it);
+							sendPlayerJoin((**it).playerNum, (**it).body.getPosition().x, (**it).body.getPosition().y);
 						}
 						else
 						{
@@ -186,30 +185,22 @@ void NetworkManager::processInput()
 						(**it).writeLock.lock();
 						(**it).writeQueue.push(packet);
 						(**it).writeLock.unlock();
+
+						sendSetup(*it);
+						sendPlayerJoin((**it).playerNum, (**it).body.getPosition().x, (**it).body.getPosition().y);
 					}
 				}
 				// If it's a directional code
-				else if(code == 1)
+				else if(code == DIRECTION_COMMAND)
 				{
 					int clientNum;
-				//	float posX, posY;
-					pkt >> clientNum >> (**it).dirX >> (**it).dirY;
+					float posX, posY;
+					pkt >> clientNum >> (**it).dirX >> (**it).dirY >> posX >> posY;
 
-					std::cout << "The new direction for client " << clientNum << " is: " << (**it).dirX << " , " << (**it).dirY << std::endl;
+					(**it).body.setPosition(posX, posY);
 
 					// Send the direction to the other clients
-					/*for(auto iter = clientList.begin(); iter != clientList.end(); iter++)
-					{
-						if((**iter).playerNum != clientNum)
-						{
-							sf::Packet packet;
-							packet << 1 << clientNum << (**it).dirX << (**it).dirY;
-
-							(**iter).writeLock.lock();
-							(**iter).writeQueue.push(packet);
-							(**iter).writeLock.unlock();
-						}
-					}*/
+					sendDirection(clientNum, (**it).dirX, (**it).dirY, (**it).body.getPosition().x, (**it).body.getPosition().y);
 				}
 			}
 		}
@@ -223,29 +214,39 @@ void NetworkManager::gameProcess(float deltaTime)
 
 	for(auto it = clientList.begin(); it != clientList.end(); it++)
 	{
-		
-		//
-		//move the player's body.  It's movement directions are already getting sent in processInputs
-		(**it).body.move((**it).dirX *(SPEED)* deltaTime,(**it).dirY *(SPEED)*deltaTime);
+		//std::cout << (**it).body.getGlobalBounds().top << " " << (**it).body.getLocalBounds().height << " " << (**it).body.getGlobalBounds().left << " " << (**it).body.getLocalBounds().width << std::endl;
 
+		float xMove, yMove;
+		xMove = (**it).dirX*SPEED*deltaTime;
+		yMove = (**it).dirY*SPEED*deltaTime;
+
+		//move the player's body.  It's movement directions are already getting sent in processInputs
+		(**it).body.move(xMove, yMove);
 
 		//Player collision on player
 		for(auto iter = clientList.begin(); iter != clientList.end(); iter++)
 		{
-			if((**it).body.getGlobalBounds().intersects((**iter).body.getGlobalBounds()))
+			if((**it).playerNum != (**iter).playerNum && (**it).body.getGlobalBounds().intersects((**iter).body.getGlobalBounds()))
 			{
-
 				if((**it).body.getLocalBounds().width > (**iter).body.getLocalBounds().width )
 				{
 					(**iter).body.setSize(sf::Vector2f(INITIAL_SIZE, INITIAL_SIZE));
 					//(**iter).body.setPosition(sf::Vector2f(WINDOWSIZEX/2 - (**iter).body.getLocalBounds().width/2, WINDOWSIZEY/2 - (**iter).body.getLocalBounds().height/2));
 					(**iter).body.setPosition(sf::Vector2f(1+rand()%(WINDOWSIZEX),1+rand()%(WINDOWSIZEY)));
+
+					sendPlayerEaten((**it).playerNum, (**iter).body.getLocalBounds().width, 
+						(**iter).score, (**iter).playerNum, (**iter).body.getPosition().x, 
+						(**iter).body.getPosition().y);
 				}
 				else if((**it).body.getLocalBounds().width < (**iter).body.getLocalBounds().width )
 				{
 					(**it).body.setSize(sf::Vector2f(INITIAL_SIZE, INITIAL_SIZE));
 					//(**it).body.setPosition(sf::Vector2f(WINDOWSIZEX/2 - (**it).body.getLocalBounds().width/2, WINDOWSIZEY/2 - (**it).body.getLocalBounds().height/2));
 					(**it).body.setPosition(sf::Vector2f(1+rand()%(WINDOWSIZEX),1+rand()%(WINDOWSIZEY)));
+
+					sendPlayerEaten((**iter).playerNum, (**it).body.getLocalBounds().width, 
+						(**it).score, (**it).playerNum, (**it).body.getPosition().x, 
+						(**it).body.getPosition().y);
 				}
 				else
 				{
@@ -257,13 +258,12 @@ void NetworkManager::gameProcess(float deltaTime)
 					//(**it).body.setPosition(sf::Vector2f(WINDOWSIZEX/2 - (**it).body.getLocalBounds().width/2, WINDOWSIZEY/2 - (**it).body.getLocalBounds().height/2));
 					(**it).body.setPosition(sf::Vector2f(1+rand()%(WINDOWSIZEX),1+rand()%(WINDOWSIZEY)));
 
+					sendPlayerDeath((**it).playerNum, (**it).body.getPosition().x, (**it).body.getPosition().y);
+					sendPlayerDeath((**iter).playerNum, (**iter).body.getPosition().x, (**iter).body.getPosition().y);
 				}
-
-
 			}
 		}
 
-		
 		// If my player collides with a pellet
 		for(int pelletCount = 0; pelletCount < NUM_PELLETS; pelletCount++)
 		{
@@ -276,38 +276,140 @@ void NetworkManager::gameProcess(float deltaTime)
 	
 				// Increase the player size
 				(**it).body.setSize(sf::Vector2f((**it).body.getSize().x + 2, (**it).body.getSize().y+2));
+				sendPelletEaten(pelletCount, randPelletLocX, randPelletLocY, (**it).playerNum);
+				
 				std::cout << "Client " << (**it).socket->getRemoteAddress().toString() << " has collided with and ate a pellet!" << std::endl;
 
 			}
 		}
 
-
-
-
-
-		if((**it).body.getGlobalBounds().top < 0 || (**it).body.getGlobalBounds().top +(**it).body.getGlobalBounds().height > WINDOWSIZEY ||
-		(**it).body.getGlobalBounds().left < 0 || (**it).body.getGlobalBounds().left + (**it).body.getGlobalBounds().width > WINDOWSIZEX)
+		if((**it).body.getGlobalBounds().top < 0.0f || (**it).body.getGlobalBounds().top +(**it).body.getGlobalBounds().height > (float)WINDOWSIZEY ||
+		(**it).body.getGlobalBounds().left < 0.0f || (**it).body.getGlobalBounds().left + (**it).body.getGlobalBounds().width > (float)WINDOWSIZEX)
 		{
 			// Resize the player and set them to the center of the screen
 			(**it).body.setSize(sf::Vector2f(INITIAL_SIZE, INITIAL_SIZE));
-			(**it).body.setPosition(sf::Vector2f(WINDOWSIZEX/2 - (**it).body.getLocalBounds().width/2, WINDOWSIZEY/2 - (**it).body.getLocalBounds().height/2));
+			//(**it).body.setPosition(sf::Vector2f(WINDOWSIZEX/2 - (**it).body.getLocalBounds().width/2, WINDOWSIZEY/2 - (**it).body.getLocalBounds().height/2));
+			(**it).setRandomPosition();
 			//delay = 0.0f;
 
+			sendPlayerDeath((**it).playerNum, (**it).body.getPosition().x, (**it).body.getPosition().y);
 
 			std::cout << "Client " << (**it).socket->getRemoteAddress().toString() << " has hit a wall!" << std::endl;
-
 		}
+	}
+}
 
+void NetworkManager::sendSetup(Player* p)
+{
+	sf::Packet pkt;
+	pkt << INITIALIZATION_CODE;
+	pkt << p->body.getPosition().x << p->body.getPosition().y;
 
-		
-		
-		
-
-
-
-
+	// Add in all of the pellet data
+	for(int i = 0; i < NUM_PELLETS; i++)
+	{
+		pkt << pelletList[i].getPosition().x << pelletList[i].getPosition().y;	
+	}
+	// Say how many players are in the game
+	pkt << clientList.size() - 1;
+	// Add in all of the player data
+	for(auto it = clientList.begin(); it!= clientList.end(); it++)
+	{
+		if((**it).playerNum != p->playerNum)
+			pkt << (**it).playerNum << (**it).body.getPosition().x << (**it).body.getPosition().y << (**it).dirX << (**it).dirY << (**it).body.getLocalBounds().width << (**it).score;
 	}
 
+	p->writeLock.lock();
+	p->writeQueue.push(pkt);
+	p->writeLock.unlock();
+}
 
-	
+void NetworkManager::sendPlayerJoin(int clientNum, float posX, float posY)
+{
+	for(auto it = clientList.begin(); it != clientList.end(); it++)
+	{
+		if((**it).playerNum != clientNum)
+		{
+			sf::Packet pkt;
+			pkt << PLAYER_JOIN << clientNum << posX << posY;
+
+			(**it).writeLock.lock();
+			(**it).writeQueue.push(pkt);
+			(**it).writeLock.unlock();
+		}
+	}
+}
+
+void NetworkManager::sendPlayerDisconnect(int clientNum)
+{
+	for(auto it = clientList.begin(); it != clientList.end(); it++)
+	{
+		if((**it).playerNum != clientNum)
+		{
+			sf::Packet pkt;
+			pkt << PLAYER_DISCONNECT << clientNum;
+
+			(**it).writeLock.lock();
+			(**it).writeQueue.push(pkt);
+			(**it).writeLock.unlock();
+		}
+	}
+}
+
+void NetworkManager::sendPlayerEaten(int hunter, float width, int score, int prey, float posX, float posY)
+{
+	for(auto it = clientList.begin(); it != clientList.end(); it++)
+	{
+		sf::Packet pkt;
+
+		pkt << PLAYER_EATEN << hunter << width << score << prey << posX << posY;
+
+		(**it).writeLock.lock();
+		(**it).writeQueue.push(pkt);
+		(**it).writeLock.unlock();
+	}
+}
+
+void NetworkManager::sendPlayerDeath(int clientNum, float posX, float posY)
+{
+	for(auto it = clientList.begin(); it != clientList.end(); it++)
+	{
+		sf::Packet pkt;
+
+		pkt << PLAYER_DEATH << clientNum << posX << posY;
+
+		(**it).writeLock.lock();
+		(**it).writeQueue.push(pkt);
+		(**it).writeLock.unlock();
+	}
+}
+
+void NetworkManager::sendPelletEaten(int pelletNum, float posX, float posY, int clientNum)
+{
+	for(auto it = clientList.begin(); it != clientList.end(); it++)
+	{
+		sf::Packet pkt;
+
+		pkt << PELLET_EATEN << pelletNum << posX << posY << clientNum;
+
+		(**it).writeLock.lock();
+		(**it).writeQueue.push(pkt);
+		(**it).writeLock.unlock();
+	}
+}
+
+void NetworkManager::sendDirection(int clientNum, float dirX, float dirY, float posX, float posY)
+{
+	for(auto iter = clientList.begin(); iter != clientList.end(); iter++)
+	{
+		if((**iter).playerNum != clientNum)
+		{
+			sf::Packet packet;
+			packet << DIRECTION_COMMAND << clientNum << dirX << dirY << posX << posY;
+
+			(**iter).writeLock.lock();
+			(**iter).writeQueue.push(packet);
+			(**iter).writeLock.unlock();
+		}
+	}
 }

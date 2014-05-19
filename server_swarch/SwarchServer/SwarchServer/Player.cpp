@@ -5,17 +5,18 @@
 //All of these called for each player object inside netman //delete comment if causes problems
 
 Player::Player(sf::TcpSocket* socket, int number)
-	:startingPos(500.f,500.f), socket(socket), isPlayerDisconnected(false), read(&Player::readFromClient, this), 
-	write(&Player::writeToClient, this), score(0), playerNum(number), isReadDone(false), isWriteDone(false)
+	:socket(socket), isPlayerDisconnected(false), read(&Player::readFromClient, this), 
+	write(&Player::writeToClient, this), score(0), playerNum(number), isReadDone(false), isWriteDone(false),
+	dirX(0.0f), dirY(1.0f)
 {
 	body.setSize(sf::Vector2f(INITIAL_SIZE, INITIAL_SIZE));
-	body.setOrigin(body.getLocalBounds().width/2, body.getLocalBounds().height/2);
-	body.setPosition(startingPos);
+	//body.setOrigin(body.getLocalBounds().width/2, body.getLocalBounds().height/2);
+
+	setRandomPosition();
 
 	read.launch();
 	write.launch();
 }
-
 
 Player::~Player(void)
 {
@@ -82,4 +83,9 @@ void Player::endPlayer()
 		write.terminate();
 
 	delete socket;
+}
+
+void Player::setRandomPosition()
+{
+	body.setPosition(1+(rand()%WINDOW_SIZE), 1+(rand()%WINDOW_SIZE));
 }

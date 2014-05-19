@@ -24,7 +24,6 @@ GameScene::GameScene(std::string username)
 	myBox.setFillColor(sf::Color::Cyan);
 	myBox.setSize(sf::Vector2f(PLAYERSIZE,PLAYERSIZE));
 	myBox.setOrigin(myBox.getLocalBounds().width/2, myBox.getLocalBounds().height/2);
-	myBox.setPosition(WINDOWSIZEX/2, WINDOWSIZEY/2);
 
 	// Construct the pelletList
 	pelletList = new sf::RectangleShape[numOfPellets];
@@ -34,12 +33,6 @@ GameScene::GameScene(std::string username)
 	{
 		pelletList[i] =  sf::RectangleShape(sf::Vector2f(5,5));
 		pelletList[i].setFillColor(sf::Color::White);
-
-		// Choose a random location
-        randPelletLocX = 1+rand()%(WINDOWSIZEX);
-	    randPelletLocY = 1+rand()%(WINDOWSIZEY);
-
-		pelletList[i].setPosition(randPelletLocX, randPelletLocY);
 	}
 }
 
@@ -53,103 +46,93 @@ GameScene::~GameScene(void)
 void GameScene::update(float deltaTime, NetworkManager& netMan)
 {
 	// Get the input from the user to calculate direction
-	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up) && dy != -1.0f && !upPress)
+	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up) && dy != -1.0f && !upPress && netMan.update)
 	{
 		dx = 0.0f, dy = -1.0f;
 		sf::Packet pkt;
-		pkt << 1 << netMan.clientNum << dx << dy;
+		pkt << DIRECTION_COMMAND << netMan.clientNum << dx << dy << myBox.getPosition().x << myBox.getPosition().y;
 
-		netMan.tcpThread->writeLock.lock();
-		netMan.tcpThread->writeQueue.push(pkt);
-		netMan.tcpThread->writeLock.unlock();
-		
+		if(netMan.connectionMade())
+		{
+			netMan.tcpThread->writeLock.lock();
+			netMan.tcpThread->writeQueue.push(pkt);
+			netMan.tcpThread->writeLock.unlock();
+		}
+
 		upPress = true;
 	}
-	else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down) && dy != 1.0f && !downPress)
+	else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down) && dy != 1.0f && !downPress && netMan.update)
 	{
 		dx = 0.0f, dy = 1.0f;
 		sf::Packet pkt;
-		pkt << 1 << netMan.clientNum << dx << dy;
+		pkt << DIRECTION_COMMAND << netMan.clientNum << dx << dy << myBox.getPosition().x << myBox.getPosition().y;
 
-		netMan.tcpThread->writeLock.lock();
-		netMan.tcpThread->writeQueue.push(pkt);
-		netMan.tcpThread->writeLock.unlock();
+		if(netMan.connectionMade())
+		{
+			netMan.tcpThread->writeLock.lock();
+			netMan.tcpThread->writeQueue.push(pkt);
+			netMan.tcpThread->writeLock.unlock();
+		}
 
 		downPress = true;
 	}
-	else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right) && dx != 1.0f && !rightPress)
+	else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right) && dx != 1.0f && !rightPress && netMan.update)
 	{
 		dx = 1.0f, dy = 0.0f;
 		sf::Packet pkt;
-		pkt << 1 << netMan.clientNum << dx << dy;
+		pkt << DIRECTION_COMMAND << netMan.clientNum << dx << dy << myBox.getPosition().x << myBox.getPosition().y;
 
-		netMan.tcpThread->writeLock.lock();
-		netMan.tcpThread->writeQueue.push(pkt);
-		netMan.tcpThread->writeLock.unlock();
+		if(netMan.connectionMade())
+		{
+			netMan.tcpThread->writeLock.lock();
+			netMan.tcpThread->writeQueue.push(pkt);
+			netMan.tcpThread->writeLock.unlock();
+		}
 
 		rightPress = true;
 	}
-	else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left) && dx != -1.0f && !leftPress)
+	else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left) && dx != -1.0f && !leftPress && netMan.update)
 	{
 		dx = -1.0f, dy = 0.0f;
 		sf::Packet pkt;
-		pkt << 1 << netMan.clientNum << dx << dy;
-
-		netMan.tcpThread->writeLock.lock();
-		netMan.tcpThread->writeQueue.push(pkt);
-		netMan.tcpThread->writeLock.unlock();
-
+		pkt << DIRECTION_COMMAND << netMan.clientNum << dx << dy << myBox.getPosition().x << myBox.getPosition().y;
+		if(netMan.connectionMade())
+		{
+			netMan.tcpThread->writeLock.lock();
+			netMan.tcpThread->writeQueue.push(pkt);
+			netMan.tcpThread->writeLock.unlock();
+		}
 		leftPress = true;
 	}
 
-	// If my player collides with a pellet
-	for(int pelletCount = 0; pelletCount < numOfPellets; pelletCount++)
-	{
-		if(myBox.getGlobalBounds().intersects(pelletList[pelletCount].getGlobalBounds()))
-		{
-			// "Delete" the pellet and make a new one
-			randPelletLocX = 1+rand()%(WINDOWSIZEX);
-			randPelletLocY = 1+rand()%(WINDOWSIZEY);
-			pelletList[pelletCount].setPosition(randPelletLocX, randPelletLocY);
-	
-			// Increase the player size
-			myBox.setSize(sf::Vector2f(myBox.getSize().x + 2, myBox.getSize().y+2));
-		}
-	}
+	processInput(netMan);
 
-	// If my player collides with a wall
-	if(myBox.getGlobalBounds().top < 0 || myBox.getGlobalBounds().top + myBox.getGlobalBounds().height > WINDOWSIZEY ||
-		myBox.getGlobalBounds().left < 0 || myBox.getGlobalBounds().left + myBox.getGlobalBounds().width > WINDOWSIZEX)
-	{
-		// Resize the player and set them to the center of the screen
-		myBox.setSize(sf::Vector2f(PLAYERSIZE,PLAYERSIZE));
-		myBox.setPosition(sf::Vector2f(WINDOWSIZEX/2 - myBox.getLocalBounds().width/2, WINDOWSIZEY/2 - myBox.getLocalBounds().height/2));
-		delay = 0.0f;
-	}
+	float xMove, yMove;
+	xMove = dx*SPEED*deltaTime;
+	yMove = dy*SPEED*deltaTime;
 
-	// Not a good delay as speeds may vary between computers
-	// We are using the TA's implementation
-	delay = delay - deltaTime;
+	myBox.move(xMove, yMove);
 
-	if(delay < 1.0f)
+	for(auto it = playerList.begin(); it!= playerList.end(); it++)
 	{
-		myBox.move(dx*deltaTime*SPEED, dy*deltaTime*SPEED);
-		delay = (myBox.getLocalBounds().width - 10.0f) / 2.0f;
-	}
-	else
-	{
-		myBox.move(dx, dy);
-		delay = (myBox.getLocalBounds().width - 10.0f) / 2.0f;
+		(*it).body.move((*it).dx*SPEED*deltaTime, (*it).dy*SPEED*deltaTime);
+		//(*it).move(dx*SPEED*deltaTime, dy*SPEED*deltaTime);
 	}
 }
 
 void GameScene::draw(sf::RenderWindow& window)
 {
 	window.draw(userName);
-	window.draw(myBox);
+	// Draw the pellets
 	for(int i = 0; i < numOfPellets; i++)
 	{
 		window.draw(pelletList[i]);
+	}
+	window.draw(myBox);
+	// Draw the players
+	for(auto it = playerList.begin(); it != playerList.end(); it++)
+	{
+		window.draw((*it).body);
 	}
 }
 
@@ -159,7 +142,7 @@ UserData GameScene::processEvents(sf::Event& evt, sf::RenderWindow& window, Netw
 	UserData user("","");
 	if (evt.type == sf::Event::Closed)
 		window.close();
-	if(evt.type == sf::Event::KeyReleased)
+	if(evt.type == sf::Event::KeyReleased && netMan.update)
 	{
 		if(evt.key.code == sf::Keyboard::Up)
 		{
@@ -178,6 +161,11 @@ UserData GameScene::processEvents(sf::Event& evt, sf::RenderWindow& window, Netw
 			leftPress = false;
 		}
 	}
+	if(evt.type == sf::Event::LostFocus)
+		netMan.update = false;
+	else if(evt.type == sf::Event::GainedFocus)
+		netMan.update = true;
+
 
 
 	if(sf::Keyboard::isKeyPressed(sf::Keyboard::BackSpace))
@@ -189,4 +177,171 @@ UserData GameScene::processEvents(sf::Event& evt, sf::RenderWindow& window, Netw
 	}
 
 	return user;//Because syntax requires this
+}
+
+// Handles all of the input received from the server
+void GameScene::processInput(NetworkManager& netMan)
+{
+	if(netMan.connectionMade())
+	{
+		if(!netMan.tcpThread->readQueue.empty())
+		{
+			sf::Packet pkt;
+			pkt = netMan.tcpThread->readQueue.front();
+			netMan.tcpThread->readQueue.pop();
+
+			int code;
+			pkt >> code;
+
+			if(code == INITIALIZATION_CODE)
+			{
+				float x, y;
+				pkt >> x >> y;
+				myBox.setPosition(x, y);
+
+				// Add in all of the pellet data
+				for(int i = 0; i < numOfPellets; i++)
+				{
+					float pelletX, pelletY;
+					pkt >> pelletX >> pelletY;	
+
+					pelletList[i].setPosition(pelletX, pelletY);
+				}
+				// Say how many players are in the game
+				int clientCount;
+				pkt >> clientCount;
+				// Add in all of the player data
+				for(int i = 0; i < clientCount; i++)
+				{
+					float bodyX, bodyY, dirX, dirY, width;
+					int playerNum, score;
+
+					pkt >> playerNum >> bodyX >> bodyY >> dirX >> dirY >> width >> score;
+
+					NetworkOpponent body(score, bodyX, bodyY, playerNum);
+					body.dx = dirX;
+					body.dy = dirY;
+					playerList.push_back(body);
+				}
+			}
+			else if(code == DIRECTION_COMMAND)
+			{
+				int clientNum;
+				float dirX, dirY, posX, posY;
+				pkt >> clientNum >> dirX >> dirY >> posX >> posY;
+
+				for(auto it = playerList.begin(); it!=playerList.end(); it++)
+				{
+					if((*it).clientNum == clientNum)
+					{
+						(*it).dx=dirX;
+						(*it).dy=dirY;
+						(*it).body.setPosition(posX, posY);
+					}
+				}
+			}
+			else if(code == PLAYER_JOIN)
+			{
+				int clientNum;
+				float posX, posY;
+				pkt >> clientNum >> posX >> posY;
+
+				playerList.push_back(NetworkOpponent(0, posX, posY, clientNum));
+			}
+			else if(code == PLAYER_DISCONNECT)
+			{
+				int clientNum;
+				pkt >> clientNum;
+
+				for(auto it = playerList.begin(); it != playerList.end(); it++)
+				{
+					if((*it).clientNum == clientNum)
+					{
+						auto iterToErase = it;
+						playerList.erase(iterToErase);
+						continue;
+					}
+				}
+			}
+			else if(code == PLAYER_EATEN)
+			{
+				int hunter, score, prey;
+				float width, posX, posY;
+				pkt >> hunter >> width >> score >> prey >> posX >> posY;
+
+				if(hunter == netMan.clientNum)
+				{
+					myBox.setSize(sf::Vector2f(myBox.getSize().x + width, myBox.getSize().y + width));
+
+					for(auto it = playerList.begin(); it!=playerList.end(); it++)
+					{
+						if((*it).clientNum == prey)
+						{
+							(*it).body.setSize(sf::Vector2f(10,10));
+							(*it).body.setPosition(posX, posY);
+						}
+					}
+				}
+				else
+				{
+					for(auto it = playerList.begin(); it!=playerList.end(); it++)
+					{
+						if((*it).clientNum == hunter)
+						{
+							(*it).body.setSize(sf::Vector2f(myBox.getSize().x + width, myBox.getSize().y + width));
+							
+							if(prey == netMan.clientNum)
+							{
+								myBox.setSize(sf::Vector2f(10,10));
+								myBox.setPosition(posX, posY);
+							}
+						}
+						else if((*it).clientNum == prey)
+						{
+							(*it).body.setSize(sf::Vector2f(10,10));
+							(*it).body.setPosition(posX, posY);
+						}
+					}	
+				}
+
+			}
+			else if(code == PLAYER_DEATH)
+			{
+				int clientNum;
+				float posX, posY;
+				pkt >> clientNum >> posX >> posY;
+
+				if(clientNum == netMan.clientNum)
+				{
+					myBox.setSize(sf::Vector2f(10, 10));
+					myBox.setPosition(posX, posY);
+				}
+
+				for(auto it=playerList.begin(); it!=playerList.end(); it++)
+				{
+					(*it).body.setSize(sf::Vector2f(10, 10));
+					(*it).body.setPosition(posX, posY);
+				}
+
+			}
+			else if(code == PELLET_EATEN)
+			{
+				int pelletNum, clientNum;
+				float posX, posY;
+				pkt >> pelletNum >> posX >> posY >> clientNum;	
+
+				pelletList[pelletNum].setPosition(posX, posY);
+
+				if(clientNum == netMan.clientNum)
+				{
+					myBox.setSize(sf::Vector2f(myBox.getSize().x +2, myBox.getSize().y + 2));
+				}
+
+				for(auto it=playerList.begin(); it!=playerList.end(); it++)
+				{
+					(*it).body.setSize(sf::Vector2f((*it).body.getSize().x +2, (*it).body.getSize().y +2));
+				}
+			}
+		}
+	}
 }

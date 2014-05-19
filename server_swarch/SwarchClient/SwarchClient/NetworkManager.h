@@ -37,7 +37,7 @@ public:
 
 	TcpThreader* tcpThread;
 	int clientNum;
-
+	bool update;
 private:
 	sf::IpAddress ip;
 	int portNum;
