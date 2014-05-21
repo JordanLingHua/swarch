@@ -1,29 +1,28 @@
-﻿Build started 5/20/2014 11:15:02 PM.
-Project "C:\Users\Jordan Hua\Documents\GitHub\swarch\server_swarch\SwarchServer\SwarchServer\SwarchServer.vcxproj" on node 2 (Build target(s)).
-ClCompile:
-  C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /Zi /nologo /W3 /WX- /sdl /O2 /Oi /Oy- /GL /D SFML_STATIC /D WIN32 /D NDEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Release\\" /Fd"Release\vc110.pdb" /Gd /TP /analyze- /errorReport:prompt NetworkManager.cpp
-  NetworkManager.cpp
-NetworkManager.cpp(21): warning C4244: 'argument' : conversion from 'time_t' to 'unsigned int', possible loss of data
-NetworkManager.cpp(30): warning C4244: '=' : conversion from 'int' to 'float', possible loss of data
-NetworkManager.cpp(31): warning C4244: '=' : conversion from 'int' to 'float', possible loss of data
-NetworkManager.cpp(60): warning C4244: 'argument' : conversion from 'float' to 'sf::Int32', possible loss of data
-NetworkManager.cpp(248): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
-NetworkManager.cpp(271): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
-NetworkManager.cpp(294): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
-NetworkManager.cpp(298): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
-NetworkManager.cpp(331): warning C4244: '=' : conversion from 'int' to 'float', possible loss of data
-NetworkManager.cpp(332): warning C4244: '=' : conversion from 'int' to 'float', possible loss of data
-Link:
-  C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Jordan Hua\Documents\GitHub\swarch\server_swarch\SwarchServer\Release\SwarchServer.exe" /INCREMENTAL:NO /NOLOGO "sfml-graphics-s.lib" "sfml-window-s.lib" "sfml-system-s.lib" "sfml-audio-s.lib" "sfml-network-s.lib" "sfml-main.lib" sqlite3.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\Jordan Hua\Documents\GitHub\swarch\server_swarch\SwarchServer\Release\SwarchServer.pdb" /SUBSYSTEM:CONSOLE /OPT:REF /OPT:ICF /LTCG /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Jordan Hua\Documents\GitHub\swarch\server_swarch\SwarchServer\Release\SwarchServer.lib" /MACHINE:X86 /SAFESEH Release\DatabaseManager.obj
-  Release\main.obj
-  Release\NetworkManager.obj
-  Release\Player.obj
-  Generating code
-  Finished generating code
-sqlite3.lib(sqlite3.obj) : warning LNK4099: PDB 'vc110.pdb' was not found with 'sqlite3.lib(sqlite3.obj)' or at 'C:\Users\Jordan Hua\Documents\GitHub\swarch\server_swarch\SwarchServer\Release\vc110.pdb'; linking object as if no debug info
-  SwarchServer.vcxproj -> C:\Users\Jordan Hua\Documents\GitHub\swarch\server_swarch\SwarchServer\Release\SwarchServer.exe
-Done Building Project "C:\Users\Jordan Hua\Documents\GitHub\swarch\server_swarch\SwarchServer\SwarchServer\SwarchServer.vcxproj" (Build target(s)).
+﻿Build started 5/20/2014 11:30:12 PM.
+     1>Project "C:\Users\Jonathan\Desktop\Swarch168\swarch\server_swarch\SwarchServer\SwarchServer\SwarchServer.vcxproj" on node 2 (Build target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /Zi /nologo /W3 /WX- /sdl /O2 /Oi /Oy- /GL /D SFML_STATIC /D WIN32 /D NDEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Release\\" /Fd"Release\vc110.pdb" /Gd /TP /analyze- /errorReport:prompt NetworkManager.cpp
+         NetworkManager.cpp
+     1>NetworkManager.cpp(21): warning C4244: 'argument' : conversion from 'time_t' to 'unsigned int', possible loss of data
+     1>NetworkManager.cpp(30): warning C4244: '=' : conversion from 'int' to 'float', possible loss of data
+     1>NetworkManager.cpp(31): warning C4244: '=' : conversion from 'int' to 'float', possible loss of data
+     1>NetworkManager.cpp(60): warning C4244: 'argument' : conversion from 'float' to 'sf::Int32', possible loss of data
+     1>NetworkManager.cpp(248): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
+     1>NetworkManager.cpp(271): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
+     1>NetworkManager.cpp(294): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
+     1>NetworkManager.cpp(298): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
+     1>NetworkManager.cpp(331): warning C4244: '=' : conversion from 'int' to 'float', possible loss of data
+     1>NetworkManager.cpp(332): warning C4244: '=' : conversion from 'int' to 'float', possible loss of data
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Jonathan\Desktop\Swarch168\swarch\server_swarch\SwarchServer\Release\SwarchServer.exe" /INCREMENTAL:NO /NOLOGO "sfml-graphics-s.lib" "sfml-window-s.lib" "sfml-system-s.lib" "sfml-audio-s.lib" "sfml-network-s.lib" "sfml-main.lib" sqlite3.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\Jonathan\Desktop\Swarch168\swarch\server_swarch\SwarchServer\Release\SwarchServer.pdb" /SUBSYSTEM:CONSOLE /OPT:REF /OPT:ICF /LTCG /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Jonathan\Desktop\Swarch168\swarch\server_swarch\SwarchServer\Release\SwarchServer.lib" /MACHINE:X86 /SAFESEH Release\DatabaseManager.obj
+         Release\main.obj
+         Release\NetworkManager.obj
+         Release\Player.obj
+         Generating code
+         Finished generating code
+         SwarchServer.vcxproj -> C:\Users\Jonathan\Desktop\Swarch168\swarch\server_swarch\SwarchServer\Release\SwarchServer.exe
+     1>Done Building Project "C:\Users\Jonathan\Desktop\Swarch168\swarch\server_swarch\SwarchServer\SwarchServer\SwarchServer.vcxproj" (Build target(s)).
 
 Build succeeded.
 
-Time Elapsed 00:00:19.19
+Time Elapsed 00:00:09.81

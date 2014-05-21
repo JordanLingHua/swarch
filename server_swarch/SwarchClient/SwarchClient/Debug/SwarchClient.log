@@ -1,9 +1,9 @@
-﻿Build started 5/20/2014 11:15:23 PM.
-Project "C:\Users\Jordan Hua\Documents\GitHub\swarch\server_swarch\SwarchClient\SwarchClient\SwarchClient.vcxproj" on node 2 (Build target(s)).
-Link:
-  SwarchClient.vcxproj -> C:\Users\Jordan Hua\Documents\GitHub\swarch\server_swarch\SwarchClient\Debug\SwarchClient.exe
-Done Building Project "C:\Users\Jordan Hua\Documents\GitHub\swarch\server_swarch\SwarchClient\SwarchClient\SwarchClient.vcxproj" (Build target(s)).
+﻿Build started 5/20/2014 11:23:17 PM.
+     1>Project "C:\Users\Jonathan\Desktop\Swarch168\swarch\server_swarch\SwarchClient\SwarchClient\SwarchClient.vcxproj" on node 2 (Build target(s)).
+     1>Link:
+         SwarchClient.vcxproj -> C:\Users\Jonathan\Desktop\Swarch168\swarch\server_swarch\SwarchClient\Debug\SwarchClient.exe
+     1>Done Building Project "C:\Users\Jonathan\Desktop\Swarch168\swarch\server_swarch\SwarchClient\SwarchClient\SwarchClient.vcxproj" (Build target(s)).
 
 Build succeeded.
 
-Time Elapsed 00:00:02.88
+Time Elapsed 00:00:00.15

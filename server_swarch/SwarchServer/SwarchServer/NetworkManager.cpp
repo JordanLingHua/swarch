@@ -248,7 +248,7 @@ void NetworkManager::gameProcess(float deltaTime)
 					(**iter).body.setPosition(sf::Vector2f(1+rand()%(WINDOWSIZEX),1+rand()%(WINDOWSIZEY)));
 					
 					//update win and lose condition
-					if((**iter).numLives >= 0)
+					if((**iter).numLives > 0)
 					{
 						(**iter).numLives--;
 					}
@@ -276,7 +276,7 @@ void NetworkManager::gameProcess(float deltaTime)
 
 
 					//update win and lose condition
-					if((**it).numLives >= 0)
+					if((**it).numLives > 0)
 					{
 						(**it).numLives--;
 					}
@@ -379,28 +379,27 @@ void NetworkManager::gameProcess(float deltaTime)
 		{
 			numLostClients++;
 		}
+	}
 
-		//If all but one client lost, search for that client that won
-		if(numLostClients >= numClients - 1)
+	//If all but one client lost, search for that client that won
+	if(numLostClients >= numClients - 1 && numClients != 1)
+	{
+		for(auto iter3 = clientList.begin(); iter3 != clientList.end(); iter3++)
 		{
-			for(auto iter3 = clientList.begin(); iter3 != clientList.end(); iter3++)
+			if((**iter3).lost == false )
 			{
-				if((**iter2).lost == false)
-				{
-					//(**iter2).won = true;
-					sf::Packet pkt;
-					pkt << WIN_COMMAND << (**iter2).playerName;
+				//(**iter2).won = true;
+				sf::Packet pkt;
+				pkt << WIN_COMMAND << (**iter3).playerName;
 
-					for(auto iter4 = clientList.begin(); iter4 != clientList.end(); iter4++)
-					{
-					(**iter4).writeLock.lock();
-					(**iter4).writeQueue.push(pkt);
-					(**iter4).writeLock.unlock();
-					}
+				for(auto iter4 = clientList.begin(); iter4 != clientList.end(); iter4++)
+				{
+				(**iter4).writeLock.lock();
+				(**iter4).writeQueue.push(pkt);
+				(**iter4).writeLock.unlock();
 				}
 			}
 		}
-
 	}
 
 	/*if((**it).won == true)
