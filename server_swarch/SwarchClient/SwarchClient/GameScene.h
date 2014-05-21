@@ -10,7 +10,7 @@
 
 #define WINDOWSIZEX 500
 #define WINDOWSIZEY 500
-#define SPEED 20
+#define SPEED 100
 #define PLAYERSIZE 10
 
 #define DIRECTION_COMMAND 1

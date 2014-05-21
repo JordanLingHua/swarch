@@ -216,9 +216,10 @@ void NetworkManager::gameProcess(float deltaTime)
 	{
 		//std::cout << (**it).body.getGlobalBounds().top << " " << (**it).body.getLocalBounds().height << " " << (**it).body.getGlobalBounds().left << " " << (**it).body.getLocalBounds().width << std::endl;
 
-		float xMove, yMove;
-		xMove = (**it).dirX*SPEED*deltaTime;
-		yMove = (**it).dirY*SPEED*deltaTime;
+		float delay, xMove, yMove;
+		delay = ((**it).body.getLocalBounds().width - 10.0f);
+		xMove = (**it).dirX*(SPEED - delay)*deltaTime;
+		yMove = (**it).dirY*(SPEED - delay)*deltaTime;
 
 		//move the player's body.  It's movement directions are already getting sent in processInputs
 		(**it).body.move(xMove, yMove);
@@ -230,21 +231,27 @@ void NetworkManager::gameProcess(float deltaTime)
 			{
 				if((**it).body.getLocalBounds().width > (**iter).body.getLocalBounds().width )
 				{
+					(**it).body.setSize(sf::Vector2f((**it).body.getSize().x +(**iter).body.getSize().x, (**it).body.getSize().y +(**iter).body.getSize().y));
+
 					(**iter).body.setSize(sf::Vector2f(INITIAL_SIZE, INITIAL_SIZE));
 					//(**iter).body.setPosition(sf::Vector2f(WINDOWSIZEX/2 - (**iter).body.getLocalBounds().width/2, WINDOWSIZEY/2 - (**iter).body.getLocalBounds().height/2));
 					(**iter).body.setPosition(sf::Vector2f(1+rand()%(WINDOWSIZEX),1+rand()%(WINDOWSIZEY)));
+					
 
-					sendPlayerEaten((**it).playerNum, (**iter).body.getLocalBounds().width, 
+
+					sendPlayerEaten((**it).playerNum, (**it).body.getSize().x, 
 						(**iter).score, (**iter).playerNum, (**iter).body.getPosition().x, 
 						(**iter).body.getPosition().y);
 				}
 				else if((**it).body.getLocalBounds().width < (**iter).body.getLocalBounds().width )
 				{
+					(**iter).body.setSize(sf::Vector2f((**it).body.getSize().x +(**iter).body.getSize().x, (**it).body.getSize().y +(**iter).body.getSize().y));
+
 					(**it).body.setSize(sf::Vector2f(INITIAL_SIZE, INITIAL_SIZE));
 					//(**it).body.setPosition(sf::Vector2f(WINDOWSIZEX/2 - (**it).body.getLocalBounds().width/2, WINDOWSIZEY/2 - (**it).body.getLocalBounds().height/2));
 					(**it).body.setPosition(sf::Vector2f(1+rand()%(WINDOWSIZEX),1+rand()%(WINDOWSIZEY)));
 
-					sendPlayerEaten((**iter).playerNum, (**it).body.getLocalBounds().width, 
+					sendPlayerEaten((**iter).playerNum, (**iter).body.getLocalBounds().width, 
 						(**it).score, (**it).playerNum, (**it).body.getPosition().x, 
 						(**it).body.getPosition().y);
 				}
@@ -276,7 +283,7 @@ void NetworkManager::gameProcess(float deltaTime)
 	
 				// Increase the player size
 				(**it).body.setSize(sf::Vector2f((**it).body.getSize().x + 2, (**it).body.getSize().y+2));
-				sendPelletEaten(pelletCount, randPelletLocX, randPelletLocY, (**it).playerNum);
+				sendPelletEaten(pelletCount, randPelletLocX, randPelletLocY, (**it).playerNum, (**it).body.getSize().x);
 				
 				std::cout << "Client " << (**it).socket->getRemoteAddress().toString() << " has collided with and ate a pellet!" << std::endl;
 
@@ -384,13 +391,13 @@ void NetworkManager::sendPlayerDeath(int clientNum, float posX, float posY)
 	}
 }
 
-void NetworkManager::sendPelletEaten(int pelletNum, float posX, float posY, int clientNum)
+void NetworkManager::sendPelletEaten(int pelletNum, float posX, float posY, int clientNum, float width)
 {
 	for(auto it = clientList.begin(); it != clientList.end(); it++)
 	{
 		sf::Packet pkt;
 
-		pkt << PELLET_EATEN << pelletNum << posX << posY << clientNum;
+		pkt << PELLET_EATEN << pelletNum << posX << posY << clientNum << width;
 
 		(**it).writeLock.lock();
 		(**it).writeQueue.push(pkt);

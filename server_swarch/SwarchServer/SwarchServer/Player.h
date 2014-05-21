@@ -7,7 +7,7 @@
 
 #define INITIAL_SIZE 10
 #define WINDOW_SIZE 500
-#define SPEED 20//not worrying about speed in this commit
+#define SPEED 100//not worrying about speed in this commit
 
 class Player
 {

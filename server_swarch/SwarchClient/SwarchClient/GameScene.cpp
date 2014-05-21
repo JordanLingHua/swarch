@@ -108,14 +108,16 @@ void GameScene::update(float deltaTime, NetworkManager& netMan)
 	processInput(netMan);
 
 	float xMove, yMove;
-	xMove = dx*SPEED*deltaTime;
-	yMove = dy*SPEED*deltaTime;
+	delay = (myBox.getLocalBounds().width - 10.0f);
+	xMove = dx*(SPEED - delay)*deltaTime;
+	yMove = dy*(SPEED - delay)*deltaTime;
 
 	myBox.move(xMove, yMove);
 
 	for(auto it = playerList.begin(); it!= playerList.end(); it++)
 	{
-		(*it).body.move((*it).dx*SPEED*deltaTime, (*it).dy*SPEED*deltaTime);
+		(*it).delay = ((*it).body.getLocalBounds().width - 10.0f);
+		(*it).body.move((*it).dx*(SPEED - (*it).delay)*deltaTime, (*it).dy*(SPEED - (*it).delay)*deltaTime);
 		//(*it).move(dx*SPEED*deltaTime, dy*SPEED*deltaTime);
 	}
 }
@@ -284,7 +286,7 @@ void GameScene::processInput(NetworkManager& netMan)
 
 				if(hunter == netMan.clientNum)
 				{
-					myBox.setSize(sf::Vector2f(myBox.getSize().x + width, myBox.getSize().y + width));
+					myBox.setSize(sf::Vector2f(width,width));
 
 					for(auto it = playerList.begin(); it!=playerList.end(); it++)
 					{
@@ -293,26 +295,48 @@ void GameScene::processInput(NetworkManager& netMan)
 							(*it).body.setSize(sf::Vector2f(10,10));
 							(*it).body.setPosition(posX, posY);
 						}
+
+						// If we are bigger than our opponent
+						if((*it).body.getLocalBounds().width < myBox.getLocalBounds().width)
+						{
+							(*it).body.setFillColor(sf::Color::Green);
+						}
 					}
 				}
-				else
+				else if(hunter != netMan.clientNum)
 				{
 					for(auto it = playerList.begin(); it!=playerList.end(); it++)
 					{
 						if((*it).clientNum == hunter)
 						{
-							(*it).body.setSize(sf::Vector2f(myBox.getSize().x + width, myBox.getSize().y + width));
+							(*it).body.setSize(sf::Vector2f(width, width));
 							
 							if(prey == netMan.clientNum)
 							{
 								myBox.setSize(sf::Vector2f(10,10));
 								myBox.setPosition(posX, posY);
 							}
+
+							if((*it).body.getLocalBounds().width > myBox.getLocalBounds().width)
+							{
+								(*it).body.setFillColor(sf::Color::Red);
+							}
 						}
 						else if((*it).clientNum == prey)
 						{
 							(*it).body.setSize(sf::Vector2f(10,10));
 							(*it).body.setPosition(posX, posY);
+
+							// If we are bigger than the player that _just_ died, set them to green
+							if((*it).body.getLocalBounds().width < myBox.getLocalBounds().width)
+							{
+								(*it).body.setFillColor(sf::Color::Green);
+							}
+							// If we are the same size as the player that _just_ died, set them to red
+							else
+							{
+								(*it).body.setFillColor(sf::Color::Red);
+							}
 						}
 					}	
 				}
@@ -328,31 +352,65 @@ void GameScene::processInput(NetworkManager& netMan)
 				{
 					myBox.setSize(sf::Vector2f(10, 10));
 					myBox.setPosition(posX, posY);
-				}
 
-				for(auto it=playerList.begin(); it!=playerList.end(); it++)
+					for(auto it = playerList.begin(); it!=playerList.end(); it++)
+					{
+						(*it).body.setFillColor(sf::Color::Red);
+					}
+				}
+				// If I'm not the player that died
+				else
 				{
-					(*it).body.setSize(sf::Vector2f(10, 10));
-					(*it).body.setPosition(posX, posY);
+					// Find the player that died
+					for(auto it=playerList.begin(); it!=playerList.end(); it++)
+					{
+						if((*it).clientNum == clientNum)
+						{
+							(*it).body.setSize(sf::Vector2f(10, 10));
+							(*it).body.setPosition(posX, posY);
+
+							// If they are smaller than us, set them to Green
+							if((*it).body.getLocalBounds().width > myBox.getLocalBounds().width)
+							{
+								(*it).body.setFillColor(sf::Color::Green);
+							}
+						}
+					}
 				}
 
 			}
 			else if(code == PELLET_EATEN)
 			{
 				int pelletNum, clientNum;
-				float posX, posY;
-				pkt >> pelletNum >> posX >> posY >> clientNum;	
+				float posX, posY, width;
+				pkt >> pelletNum >> posX >> posY >> clientNum >> width;	
 
 				pelletList[pelletNum].setPosition(posX, posY);
 
 				if(clientNum == netMan.clientNum)
 				{
-					myBox.setSize(sf::Vector2f(myBox.getSize().x +2, myBox.getSize().y + 2));
+					myBox.setSize(sf::Vector2f(width, width));
+					//after the pellet is consumed, if any of the other players are now smaller, make them green locally on your side
+					for(auto it=playerList.begin(); it!=playerList.end(); it++)
+					{
+						if((*it).body.getLocalBounds().width < myBox.getLocalBounds().width)
+						{
+							(*it).body.setFillColor(sf::Color::Green);
+						}
+					}
 				}
 
 				for(auto it=playerList.begin(); it!=playerList.end(); it++)
 				{
-					(*it).body.setSize(sf::Vector2f((*it).body.getSize().x +2, (*it).body.getSize().y +2));
+					if((*it).clientNum == clientNum)
+					{
+						(*it).body.setSize(sf::Vector2f(width, width));
+
+						if((*it).body.getLocalBounds().width > myBox.getLocalBounds().width)
+						{
+							(*it).body.setFillColor(sf::Color::Red);
+						}
+					}
 				}
 			}
 		}

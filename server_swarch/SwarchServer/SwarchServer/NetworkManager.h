@@ -50,7 +50,7 @@ private:
 	void sendPlayerDisconnect(int clientNum);
 	void sendPlayerEaten(int hunter, float width, int score, int prey, float posX, float posY);
 	void sendPlayerDeath(int clientNum, float posX, float posY);
-	void sendPelletEaten(int pelletNum, float posX, float posY, int clientNum);
+	void sendPelletEaten(int pelletNum, float posX, float posY, int clientNum, float width);
 
 	sf::TcpListener listener;
 	sf::SocketSelector selector;

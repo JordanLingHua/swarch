@@ -9,7 +9,7 @@ public:
 	NetworkOpponent(int score, float posX, float posY, int clientNum);
 	~NetworkOpponent(void);
 
-	float dx, dy;
+	float delay, dx, dy;
 	sf::RectangleShape body;
 	int score, clientNum;
 };
