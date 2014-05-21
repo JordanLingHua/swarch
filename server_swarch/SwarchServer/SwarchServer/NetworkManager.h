@@ -20,6 +20,7 @@
 #define PLAYER_EATEN 4
 #define PLAYER_DEATH 5
 #define PELLET_EATEN 6
+#define WIN_COMMAND 7
 
 //Game Logic
 #define NUM_PELLETS 4

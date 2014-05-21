@@ -4,6 +4,7 @@
 #include "Scene.h"
 #include "NetworkOpponent.h"
 #include <list>
+#include <sstream>
 
 //Confirmed that Not needed since Scene.h has it.  But just in case.  
 #include "UserData.h"
@@ -20,6 +21,7 @@
 #define PLAYER_DEATH 5
 #define PELLET_EATEN 6
 #define INITIALIZATION_CODE 20
+#define PLAYER_WON 7
 
 // The GameScene is a type of Scene in which users can play Swarch
 class GameScene : public Scene
@@ -40,13 +42,16 @@ private:
 	void processInput(NetworkManager& netMan);
 
 	sf::Font font;
-	sf::Text userName;
+	sf::Text userName, winnerText;
+	std::stringstream winnerStream;
 
 	float delay, dx, dy;
 	int randPelletLocX, randPelletLocY, numOfPellets, playerNum, score;
 	sf::RectangleShape* pelletList, myBox;
 	std::list<NetworkOpponent> playerList;
 	bool upPress, downPress, rightPress, leftPress;
+	bool playerWon;
+
 };
 
 #endif // GAMESCENE_H

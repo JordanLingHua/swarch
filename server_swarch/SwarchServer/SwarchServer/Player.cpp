@@ -7,7 +7,7 @@
 Player::Player(sf::TcpSocket* socket, int number)
 	:socket(socket), isPlayerDisconnected(false), read(&Player::readFromClient, this), 
 	write(&Player::writeToClient, this), score(0), playerNum(number), isReadDone(false), isWriteDone(false),
-	dirX(0.0f), dirY(1.0f)
+	dirX(0.0f), dirY(1.0f), numLives(3), won(false), lost(false)
 {
 	body.setSize(sf::Vector2f(INITIAL_SIZE, INITIAL_SIZE));
 	//body.setOrigin(body.getLocalBounds().width/2, body.getLocalBounds().height/2);

@@ -9,7 +9,7 @@
 */
 
 GameScene::GameScene(std::string username)
-	:delay(0), dx(0), dy(1), numOfPellets(4), upPress(false), downPress(false), rightPress(false), leftPress(false)
+	:delay(0), dx(0), dy(1), numOfPellets(4), upPress(false), downPress(false), rightPress(false), leftPress(false), playerWon(false)
 {
 	// We must load a font as SFML doesn't provide a default font to use
 	font.loadFromFile("arial.ttf");
@@ -19,6 +19,10 @@ GameScene::GameScene(std::string username)
 	userName.setString("ErrorName");
 	userName.setFont(font);
 	userName.setString(username);
+
+	winnerText.setColor(sf::Color::Green);
+	winnerText.setFont(font);
+	winnerText.setOrigin(winnerText.getLocalBounds().width/2, winnerText.getLocalBounds().height/2 );
 
 	// Create the player icon
 	myBox.setFillColor(sf::Color::Cyan);
@@ -107,18 +111,22 @@ void GameScene::update(float deltaTime, NetworkManager& netMan)
 
 	processInput(netMan);
 
-	float xMove, yMove;
-	delay = (myBox.getLocalBounds().width - 10.0f);
-	xMove = dx*(SPEED - delay)*deltaTime;
-	yMove = dy*(SPEED - delay)*deltaTime;
 
-	myBox.move(xMove, yMove);
-
-	for(auto it = playerList.begin(); it!= playerList.end(); it++)
+	if(!playerWon)
 	{
-		(*it).delay = ((*it).body.getLocalBounds().width - 10.0f);
-		(*it).body.move((*it).dx*(SPEED - (*it).delay)*deltaTime, (*it).dy*(SPEED - (*it).delay)*deltaTime);
-		//(*it).move(dx*SPEED*deltaTime, dy*SPEED*deltaTime);
+		float xMove, yMove;
+		delay = (myBox.getLocalBounds().width - 10.0f);
+		xMove = dx*(SPEED - delay)*deltaTime;
+		yMove = dy*(SPEED - delay)*deltaTime;
+
+		myBox.move(xMove, yMove);
+
+		for(auto it = playerList.begin(); it!= playerList.end(); it++)
+		{
+			(*it).delay = ((*it).body.getLocalBounds().width - 10.0f);
+			(*it).body.move((*it).dx*(SPEED - (*it).delay)*deltaTime, (*it).dy*(SPEED - (*it).delay)*deltaTime);
+			//(*it).move(dx*SPEED*deltaTime, dy*SPEED*deltaTime);
+		}
 	}
 }
 
@@ -136,6 +144,9 @@ void GameScene::draw(sf::RenderWindow& window)
 	{
 		window.draw((*it).body);
 	}
+
+	if(playerWon)
+		window.draw(winnerText);
 }
 
 //void GameScene::processEvents(sf::Event& evt, sf::RenderWindow& window)
@@ -422,6 +433,21 @@ void GameScene::processInput(NetworkManager& netMan)
 						}
 					}
 				}
+			}
+			else if(code == PLAYER_WON)
+			{
+				std::string winner;
+				pkt >> winner;
+
+				// set a boolean saying a player won
+				playerWon = true;
+
+				// set winner sf::text to winner string
+				winnerStream << winner << " has won";
+
+				winnerText.setString(winnerStream.str());
+				winnerStream.str("");
+				winnerStream.clear();
 			}
 		}
 	}

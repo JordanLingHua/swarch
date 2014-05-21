@@ -167,6 +167,7 @@ void NetworkManager::processInput()
 
 							sendSetup(*it);
 							sendPlayerJoin((**it).playerNum, (**it).body.getPosition().x, (**it).body.getPosition().y);
+							(**it).playerName = user;
 						}
 						else
 						{
@@ -190,6 +191,7 @@ void NetworkManager::processInput()
 
 						sendSetup(*it);
 						sendPlayerJoin((**it).playerNum, (**it).body.getPosition().x, (**it).body.getPosition().y);
+						(**it).playerName = user;				
 					}
 				}
 				// If it's a directional code
@@ -204,8 +206,14 @@ void NetworkManager::processInput()
 					// Send the direction to the other clients
 					sendDirection(clientNum, (**it).dirX, (**it).dirY, (**it).body.getPosition().x, (**it).body.getPosition().y);
 				}
+
 			}
+
 		}
+
+
+		
+
 	}
 	clientJoinLock.unlock();
 }
@@ -239,6 +247,15 @@ void NetworkManager::gameProcess(float deltaTime)
 					//(**iter).body.setPosition(sf::Vector2f(WINDOWSIZEX/2 - (**iter).body.getLocalBounds().width/2, WINDOWSIZEY/2 - (**iter).body.getLocalBounds().height/2));
 					(**iter).body.setPosition(sf::Vector2f(1+rand()%(WINDOWSIZEX),1+rand()%(WINDOWSIZEY)));
 					
+					//update win and lose condition
+					if((**iter).numLives >= 0)
+					{
+						(**iter).numLives--;
+					}
+					if((**iter).numLives <= 0)
+					{
+						(**iter).lost = true;
+					}
 
 
 					sendPlayerEaten((**it).playerNum, (**it).body.getSize().x, 
@@ -256,6 +273,19 @@ void NetworkManager::gameProcess(float deltaTime)
 					sendPlayerEaten((**iter).playerNum, (**iter).body.getLocalBounds().width, 
 						(**it).score, (**it).playerNum, (**it).body.getPosition().x, 
 						(**it).body.getPosition().y);
+
+
+					//update win and lose condition
+					if((**it).numLives >= 0)
+					{
+						(**it).numLives--;
+					}
+					if((**it).numLives <= 0)
+					{
+						(**it).lost = true;
+					}
+
+
 				}
 				else
 				{
@@ -269,6 +299,25 @@ void NetworkManager::gameProcess(float deltaTime)
 
 					sendPlayerDeath((**it).playerNum, (**it).body.getPosition().x, (**it).body.getPosition().y);
 					sendPlayerDeath((**iter).playerNum, (**iter).body.getPosition().x, (**iter).body.getPosition().y);
+
+					//update win and lose condition
+					if((**iter).numLives > 0)
+					{
+						(**iter).numLives--;
+					}
+					if((**iter).numLives <= 0)
+					{
+						(**iter).lost = true;
+					}
+
+					if((**it).numLives > 0)
+					{
+						(**it).numLives--;
+					}
+					if((**it).numLives <= 0)
+					{
+						(**it).lost = true;
+					}
 				}
 			}
 		}
@@ -304,8 +353,69 @@ void NetworkManager::gameProcess(float deltaTime)
 			sendPlayerDeath((**it).playerNum, (**it).body.getPosition().x, (**it).body.getPosition().y);
 
 			std::cout << "Client " << (**it).socket->getRemoteAddress().toString() << " has hit a wall!" << std::endl;
+
+			
+			//update win and lose condition
+			if((**it).numLives > 0)
+			{
+				(**it).numLives--;
+			}
+			if((**it).numLives <= 0)
+			{
+				(**it).lost = true;
+			}
+
 		}
 	}
+
+
+	//If one of the players is the remaining player that does not have a lose condition, 
+	//that player has won!
+	int numClients = clientList.size();
+	int numLostClients = 0;
+	for(auto iter2 = clientList.begin(); iter2 != clientList.end(); iter2++)
+	{
+		if((**iter2).numLives <= 0 && (**iter2).lost == true)
+		{
+			numLostClients++;
+		}
+
+		//If all but one client lost, search for that client that won
+		if(numLostClients >= numClients - 1)
+		{
+			for(auto iter3 = clientList.begin(); iter3 != clientList.end(); iter3++)
+			{
+				if((**iter2).lost == false)
+				{
+					//(**iter2).won = true;
+					sf::Packet pkt;
+					pkt << WIN_COMMAND << (**iter2).playerName;
+
+					for(auto iter4 = clientList.begin(); iter4 != clientList.end(); iter4++)
+					{
+					(**iter4).writeLock.lock();
+					(**iter4).writeQueue.push(pkt);
+					(**iter4).writeLock.unlock();
+					}
+				}
+			}
+		}
+
+	}
+
+	/*if((**it).won == true)
+	{
+		pkt << WIN_COMMAND << (**it).playerName;
+
+		for(auto iter = clientList.begin(); iter != clientList.end(); iter++)
+		{
+		(**iter).writeLock.lock();
+		(**iter).writeQueue.push(pkt);
+		(**iter).writeLock.unlock();
+		}
+
+	}*/
+
 }
 
 void NetworkManager::sendSetup(Player* p)

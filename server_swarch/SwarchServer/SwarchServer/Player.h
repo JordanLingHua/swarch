@@ -32,6 +32,14 @@ public:
 	float dirX, dirY;
 	//int dirX, dirY;
 	//dirX stores either -1, 0, or 1.  dirY stores either -1, 0, 1  <---Assume client will send these.  
+	
+	//win and lose features
+	//short int numLives;
+	int numLives;
+	bool won, lost;
+	std::string playerName;
+
+
 private:
 	sf::Vector2f startingPos;
 	sf::Thread read, write;  //Player uses threads instead of sockets this time.  //We will still traverse a list of player objects in netMan   //delete comment if causes problems
