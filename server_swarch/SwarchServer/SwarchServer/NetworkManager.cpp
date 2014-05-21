@@ -100,7 +100,6 @@ void NetworkManager::run(float deltaTime)
 	}
 
 	processInput();
-
 	gameProcess(deltaTime);
 }
 
@@ -382,8 +381,10 @@ void NetworkManager::gameProcess(float deltaTime)
 	}
 
 	//If all but one client lost, search for that client that won
-	if(numLostClients >= numClients - 1 && numClients != 1)
+	if(numLostClients >= numClients - 1 && numClients > 1)
 	{
+		done = true;
+
 		for(auto iter3 = clientList.begin(); iter3 != clientList.end(); iter3++)
 		{
 			if((**iter3).lost == false )

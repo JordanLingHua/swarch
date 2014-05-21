@@ -64,7 +64,6 @@ private:
 	sf::RectangleShape* pelletList;
 	float randPelletLocX;
 	float randPelletLocY;
-
 };
 
 #endif // NETWORKMANAGER_H

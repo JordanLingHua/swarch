@@ -201,8 +201,11 @@ void GameScene::processInput(NetworkManager& netMan)
 		if(!netMan.tcpThread->readQueue.empty())
 		{
 			sf::Packet pkt;
+
+			netMan.tcpThread->readLock.lock();
 			pkt = netMan.tcpThread->readQueue.front();
 			netMan.tcpThread->readQueue.pop();
+			netMan.tcpThread->readLock.unlock();
 
 			int code;
 			pkt >> code;
@@ -435,7 +438,7 @@ void GameScene::processInput(NetworkManager& netMan)
 					}
 				}
 			}
-			else if(code == PLAYER_WON)
+			else if(code == PLAYER_WON && !playerWon)
 			{
 				std::string winner;
 				pkt >> winner;

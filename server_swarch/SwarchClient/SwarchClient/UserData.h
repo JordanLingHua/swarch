@@ -1,7 +1,7 @@
 #ifndef USERDATA_H
 #define USERDATA_H
 
-#include <string>;
+#include <string>
 
 // Jordan will make variables that can get updated for this object
 
