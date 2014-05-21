@@ -23,6 +23,7 @@ GameScene::GameScene(std::string username)
 	winnerText.setColor(sf::Color::Green);
 	winnerText.setFont(font);
 	winnerText.setOrigin(winnerText.getLocalBounds().width/2, winnerText.getLocalBounds().height/2 );
+	winnerText.setPosition(WINDOWSIZEX/2, WINDOWSIZEY/2);
 
 	// Create the player icon
 	myBox.setFillColor(sf::Color::Cyan);

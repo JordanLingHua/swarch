@@ -10,7 +10,7 @@ Player::Player(sf::TcpSocket* socket, int number)
 	dirX(0.0f), dirY(1.0f), numLives(3), won(false), lost(false)
 {
 	body.setSize(sf::Vector2f(INITIAL_SIZE, INITIAL_SIZE));
-	//body.setOrigin(body.getLocalBounds().width/2, body.getLocalBounds().height/2);
+	body.setOrigin(body.getLocalBounds().width/2, body.getLocalBounds().height/2);
 
 	setRandomPosition();
 
