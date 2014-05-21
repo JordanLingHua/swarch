@@ -18,6 +18,8 @@ NetworkManager::NetworkManager(void)
 		dm.createTable();
 	}
 
+	srand (time(NULL));
+
 	//needed for game logic
 	pelletList = new sf::RectangleShape[NUM_PELLETS];
 	

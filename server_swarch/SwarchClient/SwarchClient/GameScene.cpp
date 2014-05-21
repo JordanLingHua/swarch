@@ -397,18 +397,28 @@ void GameScene::processInput(NetworkManager& netMan)
 						{
 							(*it).body.setFillColor(sf::Color::Green);
 						}
-					}
-				}
-
-				for(auto it=playerList.begin(); it!=playerList.end(); it++)
-				{
-					if((*it).clientNum == clientNum)
-					{
-						(*it).body.setSize(sf::Vector2f(width, width));
-
-						if((*it).body.getLocalBounds().width > myBox.getLocalBounds().width)
+						else if((*it).body.getLocalBounds().width == myBox.getLocalBounds().width)
 						{
 							(*it).body.setFillColor(sf::Color::Red);
+						}
+					}
+				}
+				else
+				{
+					for(auto it=playerList.begin(); it!=playerList.end(); it++)
+					{
+						if((*it).clientNum == clientNum)
+						{
+							(*it).body.setSize(sf::Vector2f(width, width));
+
+							if((*it).body.getLocalBounds().width >= myBox.getLocalBounds().width)
+							{
+								(*it).body.setFillColor(sf::Color::Red);
+							}
+							else
+							{
+								(*it).body.setFillColor(sf::Color::Green);
+							}
 						}
 					}
 				}
