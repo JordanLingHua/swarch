@@ -89,3 +89,8 @@ void Player::setRandomPosition()
 {
 	body.setPosition(1+(rand()%WINDOW_SIZE), 1+(rand()%WINDOW_SIZE));
 }
+
+void Player::setName(std::string name)
+{
+	playerName = name;
+}

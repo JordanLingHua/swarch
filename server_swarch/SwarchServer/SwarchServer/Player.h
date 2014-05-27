@@ -21,6 +21,7 @@ public:
 	void setRandomPosition();
 	void setScore(int score);
 	void endPlayer();
+	void setName(std::string name);
 
 	sf::RectangleShape body;
 	sf::TcpSocket* socket;

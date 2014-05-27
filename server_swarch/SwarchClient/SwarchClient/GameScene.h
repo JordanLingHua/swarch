@@ -23,6 +23,26 @@
 #define INITIALIZATION_CODE 20
 #define PLAYER_WON 7
 
+// This isn't the same object that stores the player info
+// PlayerScore is used to sort and project the names of clients in order of score
+struct PlayerScore
+{
+	std::string name;
+	int score;
+};
+
+class ScoreSort
+{
+public:
+	bool operator()(PlayerScore& s1, PlayerScore& s2) // Returns true if s1 is earlier that s2
+    {
+       if (s1.score < s2.score)
+		   return true;
+      
+       return false;
+    }
+};
+
 // The GameScene is a type of Scene in which users can play Swarch
 class GameScene : public Scene
 {
@@ -40,10 +60,12 @@ public:
 
 private:
 	void processInput(NetworkManager& netMan);
+	void sortScores();
 
 	sf::Font font;
 	sf::Text userName, winnerText;
 	std::stringstream winnerStream;
+	std::string name;
 
 	float delay, dx, dy;
 	int randPelletLocX, randPelletLocY, numOfPellets, playerNum, score;
@@ -51,7 +73,6 @@ private:
 	std::list<NetworkOpponent> playerList;
 	bool upPress, downPress, rightPress, leftPress;
 	bool playerWon;
-
 };
 
 #endif // GAMESCENE_H

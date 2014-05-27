@@ -1,5 +1,5 @@
 #include "GameScene.h"
-
+#include <queue>
 
 //This code is called twice in LoginScene.cpp to enable GameScene object to be assigned in main.cpp
 /*
@@ -9,16 +9,21 @@
 */
 
 GameScene::GameScene(std::string username)
-	:delay(0), dx(0), dy(1), numOfPellets(4), upPress(false), downPress(false), rightPress(false), leftPress(false), playerWon(false)
+	:delay(0), dx(0), dy(1), numOfPellets(4), upPress(false), downPress(false), rightPress(false), leftPress(false), playerWon(false), score(0)
 {
 	// We must load a font as SFML doesn't provide a default font to use
 	font.loadFromFile("arial.ttf");
+
+	name = username;
+
+	std::stringstream first;
+	first << name << " - 0";
 
 	// Preset the username
 	userName.setColor(sf::Color::Yellow);
 	userName.setString("ErrorName");
 	userName.setFont(font);
-	userName.setString(username);
+	userName.setString(first.str());
 
 	winnerText.setColor(sf::Color::Green);
 	winnerText.setFont(font);
@@ -232,14 +237,18 @@ void GameScene::processInput(NetworkManager& netMan)
 				{
 					float bodyX, bodyY, dirX, dirY, width;
 					int playerNum, score;
+					std::string Oname;
 
-					pkt >> playerNum >> bodyX >> bodyY >> dirX >> dirY >> width >> score;
+					pkt >> playerNum >> bodyX >> bodyY >> dirX >> dirY >> width >> score >> Oname;
 
-					NetworkOpponent body(score, bodyX, bodyY, playerNum);
+					NetworkOpponent body(score, bodyX, bodyY, playerNum, Oname);
 					body.dx = dirX;
 					body.dy = dirY;
 					playerList.push_back(body);
 				}
+
+				// Initialize the scoreboard for the playre to view
+				sortScores();
 			}
 			else if(code == DIRECTION_COMMAND)
 			{
@@ -261,25 +270,18 @@ void GameScene::processInput(NetworkManager& netMan)
 			{
 				int clientNum;
 				float posX, posY;
-				pkt >> clientNum >> posX >> posY;
+				std::string Oname;
+				pkt >> clientNum >> posX >> posY >> Oname;
 
-				playerList.push_back(NetworkOpponent(0, posX, posY, clientNum));
+				playerList.push_back(NetworkOpponent(0, posX, posY, clientNum, Oname));
+
+				// Add new player into the scoreboard
+				sortScores();
 			}
 			else if(code == PLAYER_DISCONNECT)
 			{
 				int clientNum;
 				pkt >> clientNum;
-
-/*				bool isFound = false;
-				for(auto it = playerList.begin(); it != playerList.end() && !isFound; it++)
-				{
-					if((*it).clientNum == clientNum)
-					{
-						playerList.erase(it);
-						it=playerList.begin();
-						isFound = true;
-					}
-				}*/
 
 				for(auto it = playerList.begin(); it != playerList.end(); it++)
 				{
@@ -292,16 +294,20 @@ void GameScene::processInput(NetworkManager& netMan)
 						return;
 					}
 				}
+
+				// Remove player from the scoreboard
+				sortScores();
 			}
 			else if(code == PLAYER_EATEN)
 			{
-				int hunter, score, prey;
+				int hunter, newScore, prey;
 				float width, posX, posY;
-				pkt >> hunter >> width >> score >> prey >> posX >> posY;
+				pkt >> hunter >> width >> newScore >> prey >> posX >> posY;
 
 				if(hunter == netMan.clientNum)
 				{
 					myBox.setSize(sf::Vector2f(width,width));
+					score += 10;
 
 					for(auto it = playerList.begin(); it!=playerList.end(); it++)
 					{
@@ -325,7 +331,8 @@ void GameScene::processInput(NetworkManager& netMan)
 						if((*it).clientNum == hunter)
 						{
 							(*it).body.setSize(sf::Vector2f(width, width));
-							
+							(*it).score += 10;
+
 							if(prey == netMan.clientNum)
 							{
 								myBox.setSize(sf::Vector2f(10,10));
@@ -355,7 +362,8 @@ void GameScene::processInput(NetworkManager& netMan)
 						}
 					}	
 				}
-
+				// Sort scores as needed
+				sortScores();
 			}
 			else if(code == PLAYER_DEATH)
 			{
@@ -405,6 +413,7 @@ void GameScene::processInput(NetworkManager& netMan)
 				if(clientNum == netMan.clientNum)
 				{
 					myBox.setSize(sf::Vector2f(width, width));
+					score += 1;
 					//after the pellet is consumed, if any of the other players are now smaller, make them green locally on your side
 					for(auto it=playerList.begin(); it!=playerList.end(); it++)
 					{
@@ -425,6 +434,7 @@ void GameScene::processInput(NetworkManager& netMan)
 						if((*it).clientNum == clientNum)
 						{
 							(*it).body.setSize(sf::Vector2f(width, width));
+							(*it).score += 1;
 
 							if((*it).body.getLocalBounds().width >= myBox.getLocalBounds().width)
 							{
@@ -437,6 +447,9 @@ void GameScene::processInput(NetworkManager& netMan)
 						}
 					}
 				}
+				// Sort the score if needed
+				// See function below.  We just modified our stringstream with the sortScores function
+				sortScores();
 			}
 			else if(code == PLAYER_WON && !playerWon)
 			{
@@ -455,4 +468,47 @@ void GameScene::processInput(NetworkManager& netMan)
 			}
 		}
 	}
+}
+
+void GameScene::sortScores()
+{
+	// Create a priority queue
+	std::priority_queue<PlayerScore, std::vector<PlayerScore>, ScoreSort> scoreList;
+				
+	// Enter my player's info
+	PlayerScore myScore;
+	myScore.name = name;
+	myScore.score = score;
+
+	// Save my score
+	scoreList.push(myScore);
+
+	// For each opponent player, save their score and sort them
+	for(auto it = playerList.begin(); it!= playerList.end(); it++)
+	{
+		// Enter my player's info
+		PlayerScore opponentScore;
+		opponentScore.name = (*it).name;
+		opponentScore.score = (*it).score;
+
+		scoreList.push(opponentScore);
+	}
+
+	// Now that we have the scores, assemble the score board string
+	std::stringstream scoreStream;
+
+	// While we still have scores in our score list
+	while(!scoreList.empty())
+	{
+		// Retrieve the score
+		PlayerScore temp;
+		temp = scoreList.top();
+		scoreList.pop();
+
+		// Save the info in our scoreStream
+		// \n iterates \n to the next element to be inserted into the stringstream
+		scoreStream << temp.name << ": " << temp.score << "\n";
+	}
+
+	userName.setString(scoreStream.str());
 }

@@ -6,8 +6,8 @@
 NetworkManager::NetworkManager(void)
 	:portNum(4682), isConnected(false), threadsCreated(false), clientNum(-1), update(true)
 {
-	ip = sf::IpAddress::getLocalAddress();
-	ip = sf::IpAddress("169.234.17.66");
+	//ip = sf::IpAddress::getLocalAddress();
+	ip = sf::IpAddress("169.234.33.21");
 }
 
 

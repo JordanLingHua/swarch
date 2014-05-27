@@ -47,7 +47,7 @@ private:
 	
 	void sendDirection(int clientNum, float dirX, float dirY, float posX, float posY);
 	void sendSetup(Player* p);
-	void sendPlayerJoin(int clientNum, float posX, float posY);
+	void sendPlayerJoin(int clientNum, float posX, float posY, std::string name);
 	void sendPlayerDisconnect(int clientNum);
 	void sendPlayerEaten(int hunter, float width, int score, int prey, float posX, float posY);
 	void sendPlayerDeath(int clientNum, float posX, float posY);

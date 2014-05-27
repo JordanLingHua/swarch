@@ -164,9 +164,9 @@ void NetworkManager::processInput()
 							(**it).writeQueue.push(packet);
 							(**it).writeLock.unlock();
 
+							//(**it).setName(user);
 							sendSetup(*it);
-							sendPlayerJoin((**it).playerNum, (**it).body.getPosition().x, (**it).body.getPosition().y);
-							(**it).playerName = user;
+							sendPlayerJoin((**it).playerNum, (**it).body.getPosition().x, (**it).body.getPosition().y, user);	
 						}
 						else
 						{
@@ -188,9 +188,9 @@ void NetworkManager::processInput()
 						(**it).writeQueue.push(packet);
 						(**it).writeLock.unlock();
 
+						(**it).setName(user);	
 						sendSetup(*it);
-						sendPlayerJoin((**it).playerNum, (**it).body.getPosition().x, (**it).body.getPosition().y);
-						(**it).playerName = user;				
+						sendPlayerJoin((**it).playerNum, (**it).body.getPosition().x, (**it).body.getPosition().y, user);			
 					}
 				}
 				// If it's a directional code
@@ -205,14 +205,8 @@ void NetworkManager::processInput()
 					// Send the direction to the other clients
 					sendDirection(clientNum, (**it).dirX, (**it).dirY, (**it).body.getPosition().x, (**it).body.getPosition().y);
 				}
-
 			}
-
 		}
-
-
-		
-
 	}
 	clientJoinLock.unlock();
 }
@@ -435,7 +429,7 @@ void NetworkManager::sendSetup(Player* p)
 	for(auto it = clientList.begin(); it!= clientList.end(); it++)
 	{
 		if((**it).playerNum != p->playerNum)
-			pkt << (**it).playerNum << (**it).body.getPosition().x << (**it).body.getPosition().y << (**it).dirX << (**it).dirY << (**it).body.getLocalBounds().width << (**it).score;
+			pkt << (**it).playerNum << (**it).body.getPosition().x << (**it).body.getPosition().y << (**it).dirX << (**it).dirY << (**it).body.getLocalBounds().width << (**it).score << (**it).playerName;
 	}
 
 	p->writeLock.lock();
@@ -443,14 +437,14 @@ void NetworkManager::sendSetup(Player* p)
 	p->writeLock.unlock();
 }
 
-void NetworkManager::sendPlayerJoin(int clientNum, float posX, float posY)
+void NetworkManager::sendPlayerJoin(int clientNum, float posX, float posY, std::string name)
 {
 	for(auto it = clientList.begin(); it != clientList.end(); it++)
 	{
 		if((**it).playerNum != clientNum)
 		{
 			sf::Packet pkt;
-			pkt << PLAYER_JOIN << clientNum << posX << posY;
+			pkt << PLAYER_JOIN << clientNum << posX << posY << name;
 
 			(**it).writeLock.lock();
 			(**it).writeQueue.push(pkt);
