@@ -164,7 +164,7 @@ void NetworkManager::processInput()
 							(**it).writeQueue.push(packet);
 							(**it).writeLock.unlock();
 
-							//(**it).setName(user);
+							(**it).setName(user);
 							sendSetup(*it);
 							sendPlayerJoin((**it).playerNum, (**it).body.getPosition().x, (**it).body.getPosition().y, user);	
 						}
@@ -235,6 +235,7 @@ void NetworkManager::gameProcess(float deltaTime)
 				if((**it).body.getLocalBounds().width > (**iter).body.getLocalBounds().width )
 				{
 					(**it).body.setSize(sf::Vector2f((**it).body.getSize().x +(**iter).body.getSize().x, (**it).body.getSize().y +(**iter).body.getSize().y));
+					(**it).score += 10;
 
 					(**iter).body.setSize(sf::Vector2f(INITIAL_SIZE, INITIAL_SIZE));
 					//(**iter).body.setPosition(sf::Vector2f(WINDOWSIZEX/2 - (**iter).body.getLocalBounds().width/2, WINDOWSIZEY/2 - (**iter).body.getLocalBounds().height/2));
@@ -258,6 +259,7 @@ void NetworkManager::gameProcess(float deltaTime)
 				else if((**it).body.getLocalBounds().width < (**iter).body.getLocalBounds().width )
 				{
 					(**iter).body.setSize(sf::Vector2f((**it).body.getSize().x +(**iter).body.getSize().x, (**it).body.getSize().y +(**iter).body.getSize().y));
+					(**iter).score += 10;
 
 					(**it).body.setSize(sf::Vector2f(INITIAL_SIZE, INITIAL_SIZE));
 					//(**it).body.setPosition(sf::Vector2f(WINDOWSIZEX/2 - (**it).body.getLocalBounds().width/2, WINDOWSIZEY/2 - (**it).body.getLocalBounds().height/2));
@@ -277,8 +279,6 @@ void NetworkManager::gameProcess(float deltaTime)
 					{
 						(**it).lost = true;
 					}
-
-
 				}
 				else
 				{
@@ -327,8 +327,9 @@ void NetworkManager::gameProcess(float deltaTime)
 	
 				// Increase the player size
 				(**it).body.setSize(sf::Vector2f((**it).body.getSize().x + 2, (**it).body.getSize().y+2));
+				(**it).score += 1;
+
 				sendPelletEaten(pelletCount, randPelletLocX, randPelletLocY, (**it).playerNum, (**it).body.getSize().x);
-				
 				std::cout << "Client " << (**it).socket->getRemoteAddress().toString() << " has collided with and ate a pellet!" << std::endl;
 
 			}

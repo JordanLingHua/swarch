@@ -6,7 +6,7 @@
 class NetworkOpponent
 {
 public:
-	NetworkOpponent(int score, float posX, float posY, int clientNum, std::string name);
+	NetworkOpponent(int score, float posX, float posY, int clientNum, std::string oName);
 	~NetworkOpponent(void);
 
 	float delay, dx, dy;

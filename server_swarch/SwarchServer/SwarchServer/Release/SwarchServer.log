@@ -1,4 +1,4 @@
-﻿Build started 5/27/2014 11:57:07 AM.
+﻿Build started 5/27/2014 3:58:00 PM.
      1>Project "C:\Users\Jonathan\Desktop\Swarch168\swarch\server_swarch\SwarchServer\SwarchServer\SwarchServer.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
          C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /Zi /nologo /W3 /WX- /sdl /O2 /Oi /Oy- /GL /D SFML_STATIC /D WIN32 /D NDEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Release\\" /Fd"Release\vc110.pdb" /Gd /TP /analyze- /errorReport:prompt NetworkManager.cpp
@@ -7,8 +7,8 @@
      1>NetworkManager.cpp(30): warning C4244: '=' : conversion from 'int' to 'float', possible loss of data
      1>NetworkManager.cpp(31): warning C4244: '=' : conversion from 'int' to 'float', possible loss of data
      1>NetworkManager.cpp(60): warning C4244: 'argument' : conversion from 'float' to 'sf::Int32', possible loss of data
-     1>NetworkManager.cpp(241): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
-     1>NetworkManager.cpp(264): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
+     1>NetworkManager.cpp(242): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
+     1>NetworkManager.cpp(266): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
      1>NetworkManager.cpp(287): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
      1>NetworkManager.cpp(291): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
      1>NetworkManager.cpp(324): warning C4244: '=' : conversion from 'int' to 'float', possible loss of data
@@ -25,4 +25,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:12.39
+Time Elapsed 00:00:10.51
