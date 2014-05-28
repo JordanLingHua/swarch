@@ -61,6 +61,7 @@ public:
 private:
 	void processInput(NetworkManager& netMan);
 	void sortScores();
+	void disconnectClient(int clientNum);
 
 	sf::Font font;
 	sf::Text userName, winnerText;

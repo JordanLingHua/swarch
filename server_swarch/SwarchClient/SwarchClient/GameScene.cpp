@@ -283,17 +283,7 @@ void GameScene::processInput(NetworkManager& netMan)
 				int clientNum;
 				pkt >> clientNum;
 
-				for(auto it = playerList.begin(); it != playerList.end(); it++)
-				{
-					// Check if we need to remove the client
-					if((*it).clientNum = clientNum)//**it's are player objects
-					{
-						auto itToErase = it;
-						it++;
-						playerList.erase(itToErase);
-						return;
-					}
-				}
+				disconnectClient(clientNum);
 
 				// Remove player from the scoreboard
 				sortScores();
@@ -511,4 +501,19 @@ void GameScene::sortScores()
 	}
 
 	userName.setString(scoreStream.str());
+}
+
+void GameScene::disconnectClient(int clientNum)
+{
+	for(auto it = playerList.begin(); it != playerList.end(); it++)
+	{
+		// Check if we need to remove the client
+		if((*it).clientNum == clientNum)//**it's are player objects
+		{
+			auto itToErase = it;
+			it++;
+			playerList.erase(itToErase);
+			return;
+		}
+	}
 }
