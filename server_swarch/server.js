@@ -72,8 +72,9 @@ server.on("message", function(msg, rinfo){
 				// Make sure the high scores have been initialized
 				if(highScores != undefined)
 				{
+					var wasAdded = false;
 					// Loop through the high scores and add the score
-					for(i = 0; i < highScores.Scores.length; ++i)
+					for(i = 0; i < highScores.Scores.length && !wasAdded; i++)
 					{
 						// If the high score we are trying to add is bigger than the current entry
 						if(highScores.Scores[i].Score < jsonData.score)
@@ -81,8 +82,14 @@ server.on("message", function(msg, rinfo){
 							// Add the entry at the current point
 							highScores.Scores.splice(i,0,{"Name" : jsonData.name, "Score" : jsonData.score});
 							console.log("Inserted highscore by: " + jsonData.name);
-							break;
+							wasAdded = true;
+							//break;
 						}
+					}
+				
+					if(!wasAdded)
+					{
+						highScores.Scores.push({"Name" : jsonData.name, "Score" : jsonData.score});
 					}
 				
 					// Display the new high scores
@@ -110,6 +117,10 @@ server.on("message", function(msg, rinfo){
 							}
 						}
 					}
+					
+					// Sort the high scores
+					highScores.Scores.sort(function(a, b){
+						return b.Score - a.Score;});
 				}
 				
 				break;

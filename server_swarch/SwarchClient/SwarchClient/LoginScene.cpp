@@ -73,9 +73,8 @@ void LoginScene::update(float deltaTime, NetworkManager& netMan)
 	if(infoSent && !netMan.tcpThread->readQueue.empty() && !userObject->startGame)
 	{
 		//Extract the packet
-		sf::Packet pkt = netMan.tcpThread->readQueue.front();
-		
 		netMan.tcpThread->readLock.lock();
+		sf::Packet pkt = netMan.tcpThread->readQueue.front();
 		netMan.tcpThread->readQueue.pop();
 		netMan.tcpThread->readLock.unlock();
 
@@ -141,11 +140,14 @@ UserData LoginScene::processEvents(sf::Event& evt, sf::RenderWindow& window, Net
 		if(evt.key.code == sf::Keyboard::Return && !infoSent)
 		{
 			// We must check to see if the password and name are valid, but for now this will suffice
-			userObject->userNameStorage = user;
-			userObject->passwordStorage = password;
+			if(!user.empty() && !password.empty())
+			{
+				userObject->userNameStorage = user;
+				userObject->passwordStorage = password;
 		
-			netMan.connectToServer(user, MD5(password).hexdigest());
-			infoSent = true;
+				netMan.connectToServer(user, MD5(password).hexdigest());
+				infoSent = true;
+			}
 		}
 		// Was the key BackSpace?
 		else if(evt.key.code == sf::Keyboard::BackSpace)
@@ -165,7 +167,7 @@ UserData LoginScene::processEvents(sf::Event& evt, sf::RenderWindow& window, Net
 	else if(evt.type == sf::Event::TextEntered)
 	{
 		// If the text isn't a backspace, return or delete key
-		if(evt.text.unicode != 8 && evt.text.unicode != 15 && evt.text.unicode != 127)
+		if(evt.text.unicode != 8 && evt.text.unicode != 9 && evt.text.unicode != 13 && evt.text.unicode != 15 && evt.text.unicode != 127 && evt.text.unicode != 2386)
 		{
 			if(enterUser)
 				user += evt.text.unicode;
@@ -196,12 +198,14 @@ UserData LoginScene::processEvents(sf::Event& evt, sf::RenderWindow& window, Net
 			// We must check to see if the password and name are valid, but for now this will suffice
 			//userName.setString(user);
 			//enableGetUserNameAndPassword = true;
-			userObject->userNameStorage = user;
-			userObject->passwordStorage = password;
-
-			// Connect to our server and send the server our username and password
-			netMan.connectToServer(user, MD5(password).hexdigest());
-			infoSent = true;
+			if(!user.empty() && !password.empty())
+			{
+				userObject->userNameStorage = user;
+				userObject->passwordStorage = password;
+		
+				netMan.connectToServer(user, MD5(password).hexdigest());
+				infoSent = true;
+			}
 		}
 	}
 

@@ -266,3 +266,43 @@ void DatabaseManager::createTable()
 	// sqlite3_finalize() frees up our SQL statement that we set up in sqlite3_prepare_v2()
 	sqlite3_finalize(stmt);
 }
+
+// Sends updates to the webserver regarding updated player info
+std::list<PlayerScore> DatabaseManager::updateWebServer()
+{
+	// Construct a score list to be sent to the NetworkManager for transmission
+	std::list<PlayerScore> scoreList;
+
+	// Construct a query that will return all usernames and scores from within our table
+	std::string query = "SELECT * FROM swarchTable";
+
+	// Prepare the query for use by the sqlite
+	error = sqlite3_prepare_v2(db, query.c_str(), query.length(), &stmt, &tail);
+
+	// If an error occurred, return false
+	if(error != SQLITE_OK)
+	{
+		std::cout << "Couldn't prepare sql" << std::endl;
+		return scoreList;
+	}
+
+	// sqlite3_step() runs our query on the database
+	while(sqlite3_step(stmt) == SQLITE_ROW)
+	{
+		// Acquires the password from the database (which we recast from a const char* to a string)
+		std::string user = std::string(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0)));
+		int userScore = sqlite3_column_int(stmt, 2);
+
+		// Save the name and score
+		PlayerScore info;
+		info.name = user;
+		info.score = userScore;
+		scoreList.push_back(info);
+	}
+
+	// sqlite3_finalize() frees up our SQL statement that we set up in sqlite3_prepare_v2()
+	sqlite3_finalize(stmt);
+
+	// Send the file
+	return scoreList;
+}

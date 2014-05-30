@@ -37,6 +37,10 @@ public:
 	void run(float deltaTime);
 	bool isProgramDone();
 
+	void sendAddPlayer(const wchar_t * name, const float score);
+	void sendUpdatePlayer(const wchar_t * name, const float score);
+	void sendSaveInfo();
+
 	bool clientsJoined;
 	sf::Mutex clientJoinLock;
 
@@ -52,6 +56,10 @@ private:
 	void sendPlayerEaten(int hunter, float width, int score, int prey, float posX, float posY);
 	void sendPlayerDeath(int clientNum, float posX, float posY);
 	void sendPelletEaten(int pelletNum, float posX, float posY, int clientNum, float width);
+
+	sf::IpAddress webServerIP;
+	int webServerPort;
+	sf::UdpSocket webSocket;
 
 	sf::TcpListener listener;
 	sf::SocketSelector selector;

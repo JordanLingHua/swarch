@@ -1,8 +1,8 @@
 #include "NetworkManager.h"
-
+#include "JSON.h"
 
 NetworkManager::NetworkManager(void)
-	:done(false), clientCount(0)
+	:done(false), clientCount(0), webServerPort(1000)
 {
 	// Choose a port to listen to
 	listener.listen(4682);
@@ -33,6 +33,8 @@ NetworkManager::NetworkManager(void)
 		pelletList[i].setOrigin(2.5f, 2.5f);
 		pelletList[i].setPosition(randPelletLocX, randPelletLocY);
 	}
+
+	webServerIP = sf::IpAddress("127.0.0.1");
 }
 
 
@@ -42,8 +44,23 @@ NetworkManager::~NetworkManager(void)
 
 	for(auto it = clientList.begin(); it != clientList.end(); it++)
 	{
+		// Save info into database and web server
+		dm.updateEntry((**it).playerName, (**it).score);
+		std::wstring nameEntered((**it).playerName.begin(), (**it).playerName.end());
+		sendUpdatePlayer(nameEntered.c_str(), (float)(**it).score);
+
 		delete *it;
 	}
+	
+	// A one time use, send all the info to our webserver
+/*	std::list<PlayerScore> scoreList = dm.updateWebServer();
+	for(auto iter = scoreList.begin(); iter != scoreList.end(); iter++)
+	{
+		std::wstring userName((*iter).name.begin(), (*iter).name.end());
+		sendAddPlayer(userName.c_str(), (float)(*iter).score);
+	}*/
+
+	sendSaveInfo();
 
 	delete[] pelletList;
 }
@@ -119,6 +136,13 @@ void NetworkManager::processInput()
 		// Check if we need to remove the client
 		if((**it).isPlayerDisconnected)//**it's are player objects
 		{
+			// Save info into database and web server
+			dm.updateEntry((**it).playerName, (**it).score);
+			std::wstring nameEntered((**it).playerName.begin(), (**it).playerName.end());
+			sendUpdatePlayer(nameEntered.c_str(), (float)(**it).score);
+			sendSaveInfo();
+
+			// Remove the player
 			selector.remove(*(**it).socket);
 			auto itToErase = it;
 			it++;
@@ -180,7 +204,10 @@ void NetworkManager::processInput()
 					{
 						// The user doesn't exist, create the entry!
 						dm.insertEntry(user, pass);
-								
+						std::wstring nameEntered(user.begin(), user.end());
+						sendAddPlayer(nameEntered.c_str(), 0.0f);
+						sendSaveInfo();
+
 						// Send a yes to the client
 						packet << "y" << (**it).playerNum;
 						
@@ -397,20 +424,6 @@ void NetworkManager::gameProcess(float deltaTime)
 			}
 		}
 	}
-
-	/*if((**it).won == true)
-	{
-		pkt << WIN_COMMAND << (**it).playerName;
-
-		for(auto iter = clientList.begin(); iter != clientList.end(); iter++)
-		{
-		(**iter).writeLock.lock();
-		(**iter).writeQueue.push(pkt);
-		(**iter).writeLock.unlock();
-		}
-
-	}*/
-
 }
 
 void NetworkManager::sendSetup(Player* p)
@@ -526,4 +539,98 @@ void NetworkManager::sendDirection(int clientNum, float dirX, float dirY, float 
 			(**iter).writeLock.unlock();
 		}
 	}
+}
+
+// Sends info for a new player to the web server upon creation, so the web server can state who currently plays the game
+void NetworkManager::sendAddPlayer(const wchar_t * name, const float score)
+{
+	// We create a JSON type object so our web server can parse the data in Javascript
+	// The AddScore JSONObject holds an action, name and score
+	JSONObject data;
+	data[L"action"] = new JSONValue(L"AddScore");
+	data[L"name"] = new JSONValue(name);
+	data[L"score"] = new JSONValue(score);
+
+	// We calculate the new JSON object from the JSONObject we just constructed, preparing it for use in Javascript
+	JSONValue* val = new JSONValue(data);
+	data.clear();
+
+	// We transform the JSONValue into a string so we can send it across the network
+	std::wstring dataString = val->Stringify();
+	delete val;
+
+	// In order to send the value over the network, we convert it into a normal string
+	std::string notSoWide;
+	notSoWide.assign(dataString.begin(), dataString.end());
+	
+	// We construct our packet and feed the new JSON string into the packet
+	sf::Packet packet;
+	packet.append(notSoWide.c_str(), notSoWide.length());
+
+	// We send the packet across the server, which may or may not make it
+	// Although webSocket is a UdpSocket, it doesn't connect to any server
+	// webSocket attempts to send any data
+	webSocket.send(packet, webServerIP, webServerPort);
+}
+
+// Sends info to the web server regarding all scores received by each player
+void NetworkManager::sendUpdatePlayer(const wchar_t * name, const float score)
+{
+	// We create a JSON type object so our web server can parse the data in Javascript
+	// The UpdateScore JSONObject holds an action, name and score
+	JSONObject data;
+	data[L"action"] = new JSONValue(L"UpdateScore");
+	data[L"name"] = new JSONValue(name);
+	data[L"score"] = new JSONValue(score);
+
+	// We calculate the new JSON object from the JSONObject we just constructed, preparing it for use in Javascript
+	JSONValue* val = new JSONValue(data);
+	data.clear();
+
+	// We transform the JSONValue into a string so we can send it across the network
+	std::wstring dataString = val->Stringify();
+	delete val;
+
+	// In order to send the value over the network, we convert it into a normal string
+	std::string notSoWide;
+	notSoWide.assign(dataString.begin(), dataString.end());
+
+	// We construct our packet and feed the new JSON string into the packet
+	sf::Packet packet;
+	packet.append(notSoWide.c_str(), notSoWide.length());
+
+	// We send the packet across the server, which may or may not make it
+	// Although webSocket is a UdpSocket, it doesn't connect to any server
+	// webSocket attempts to send any data
+	webSocket.send(packet, webServerIP, webServerPort);
+}
+
+// Tells the server to save the info to a text file
+void NetworkManager::sendSaveInfo()
+{
+	// We create a JSON type object so our web server can parse the data in Javascript
+	// The SaveScores JSONObject holds only an action
+	JSONObject data;
+	data[L"action"] = new JSONValue(L"SaveScores");
+
+	// We calculate the new JSON object from the JSONObject we just constructed, preparing it for use in Javascript
+	JSONValue* val = new JSONValue(data);
+	data.clear();
+
+	// We transform the JSONValue into a string so we can send it across the network
+	std::wstring dataString = val->Stringify();
+	delete val;
+
+	// In order to send the value over the network, we convert it into a normal string
+	std::string notSoWide;
+	notSoWide.assign(dataString.begin(), dataString.end());
+
+	// We construct our packet and feed the new JSON string into the packet
+	sf::Packet packet;
+	packet.append(notSoWide.c_str(), notSoWide.length());
+
+	// We send the packet across the server, which may or may not make it
+	// Although webSocket is a UdpSocket, it doesn't connect to any server
+	// webSocket attempts to send any data
+	webSocket.send(packet, webServerIP, webServerPort);
 }
