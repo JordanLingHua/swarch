@@ -248,8 +248,15 @@ void NetworkManager::gameProcess(float deltaTime)
 
 		float delay, xMove, yMove;
 		delay = ((**it).body.getLocalBounds().width - 10.0f);
+		if(delay >= SPEED)
+		{
+			delay = 98.f;
+		}
+		
 		xMove = (**it).dirX*(SPEED - delay)*deltaTime;
 		yMove = (**it).dirY*(SPEED - delay)*deltaTime;
+
+
 
 		//move the player's body.  It's movement directions are already getting sent in processInputs
 		(**it).body.move(xMove, yMove);

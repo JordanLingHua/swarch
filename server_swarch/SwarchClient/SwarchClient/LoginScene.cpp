@@ -56,7 +56,7 @@ LoginScene::LoginScene(void)
 
 	userObject = new UserData("","");
 
-
+	userBox.setFillColor(sf::Color::Yellow);
 }
 
 LoginScene::~LoginScene(void)
@@ -187,11 +187,16 @@ UserData LoginScene::processEvents(sf::Event& evt, sf::RenderWindow& window, Net
 		{
 			enterUser = true;
 			enterPass = false;
+
+			userBox.setFillColor(sf::Color::Yellow);
+			passBox.setFillColor(sf::Color::White);
 		}
 		else if(passBox.getGlobalBounds().contains(mousePos.x, mousePos.y))
 		{
 			enterUser = false;
 			enterPass = true;
+			userBox.setFillColor(sf::Color::White);
+			passBox.setFillColor(sf::Color::Yellow);
 		}
 		else if(enterButton.getGlobalBounds().contains(mousePos.x, mousePos.y) && !infoSent)
 		{

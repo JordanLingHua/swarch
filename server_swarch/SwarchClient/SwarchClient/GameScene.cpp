@@ -122,6 +122,12 @@ void GameScene::update(float deltaTime, NetworkManager& netMan)
 	{
 		float xMove, yMove;
 		delay = (myBox.getLocalBounds().width - 10.0f);
+		
+		if(delay >= SPEED)
+		{
+			delay = 98.f;
+		}
+
 		xMove = dx*(SPEED - delay)*deltaTime;
 		yMove = dy*(SPEED - delay)*deltaTime;
 
@@ -130,6 +136,12 @@ void GameScene::update(float deltaTime, NetworkManager& netMan)
 		for(auto it = playerList.begin(); it!= playerList.end(); it++)
 		{
 			(*it).delay = ((*it).body.getLocalBounds().width - 10.0f);
+			
+			if((*it).delay >= SPEED)
+			{
+				(*it).delay = 98.f;
+			}
+			
 			(*it).body.move((*it).dx*(SPEED - (*it).delay)*deltaTime, (*it).dy*(SPEED - (*it).delay)*deltaTime);
 			//(*it).move(dx*SPEED*deltaTime, dy*SPEED*deltaTime);
 		}
