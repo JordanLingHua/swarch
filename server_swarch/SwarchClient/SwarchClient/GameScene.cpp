@@ -241,7 +241,7 @@ void GameScene::processInput(NetworkManager& netMan)
 
 					pkt >> playerNum >> bodyX >> bodyY >> dirX >> dirY >> width >> score >> Oname;
 
-					NetworkOpponent body(score, bodyX, bodyY, playerNum, Oname);
+					NetworkOpponent body(score, bodyX, bodyY, playerNum, Oname, width);
 					body.dx = dirX;
 					body.dy = dirY;
 					playerList.push_back(body);
@@ -273,7 +273,7 @@ void GameScene::processInput(NetworkManager& netMan)
 				std::string Oname;
 				pkt >> clientNum >> posX >> posY >> Oname;
 
-				playerList.push_back(NetworkOpponent(0, posX, posY, clientNum, Oname));
+				playerList.push_back(NetworkOpponent(0, posX, posY, clientNum, Oname, 10));
 
 				// Add new player into the scoreboard
 				sortScores();

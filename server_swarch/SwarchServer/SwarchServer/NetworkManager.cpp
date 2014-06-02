@@ -282,6 +282,10 @@ void NetworkManager::gameProcess(float deltaTime)
 					sendPlayerEaten((**it).playerNum, (**it).body.getSize().x, 
 						(**iter).score, (**iter).playerNum, (**iter).body.getPosition().x, 
 						(**iter).body.getPosition().y);
+
+					std::wstring nameEntered((**it).playerName.begin(), (**it).playerName.end());
+					sendUpdatePlayer(nameEntered.c_str(), (float)(**it).score);
+					sendSaveInfo();
 				}
 				else if((**it).body.getLocalBounds().width < (**iter).body.getLocalBounds().width )
 				{
@@ -296,6 +300,9 @@ void NetworkManager::gameProcess(float deltaTime)
 						(**it).score, (**it).playerNum, (**it).body.getPosition().x, 
 						(**it).body.getPosition().y);
 
+					std::wstring nameEntered((**iter).playerName.begin(), (**iter).playerName.end());
+					sendUpdatePlayer(nameEntered.c_str(), (float)(**iter).score);
+					sendSaveInfo();
 
 					//update win and lose condition
 					if((**it).numLives > 0)
@@ -359,6 +366,9 @@ void NetworkManager::gameProcess(float deltaTime)
 				sendPelletEaten(pelletCount, randPelletLocX, randPelletLocY, (**it).playerNum, (**it).body.getSize().x);
 				std::cout << "Client " << (**it).socket->getRemoteAddress().toString() << " has collided with and ate a pellet!" << std::endl;
 
+				std::wstring nameEntered((**it).playerName.begin(), (**it).playerName.end());
+				sendUpdatePlayer(nameEntered.c_str(), (float)(**it).score);
+				sendSaveInfo();
 			}
 		}
 
